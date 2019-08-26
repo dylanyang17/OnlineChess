@@ -66,6 +66,27 @@ QString MainWindow::ind2type(int a){
     }
 }
 
+QPoint MainWindow::str2pos(QString s){
+    assert(s.length()==2);
+    return QPoint(char2ind(s.at(0)), s.mid(1,1).toInt()) ;
+}
+
+QString MainWindow::pos2str(QPoint pos){
+    return ind2char(pos.x()) + QString::number(pos.y()) ;
+}
+
+QList<chessman> MainWindow::str2chessman(QString s, int color){
+    //将一行字符串转换为若干chessman
+    QList<chessman> list;
+    QStringList strList = s.split(' ') ;
+    int type = type2ind(strList.at(0)) ;
+    for(int i=2;i<strList.length();++i){
+        QPoint pos = str2pos(strList.at(i)) ;
+        list.append(chessman(type, color, pos)) ;
+    }
+    return list;
+}
+
 int MainWindow::getGroundType(int x, int y){
     //返回地面颜色（黑色为1，白色为0）
     return (x+y)%2^1 ;

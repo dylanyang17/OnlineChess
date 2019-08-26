@@ -34,6 +34,9 @@ public:
     int getGroundType(int x, int y);
     int type2ind(QString s);
     QString ind2type(int a);
+    QList<chessman> str2chessman(QString s, int color);
+    QPoint str2pos(QString s);
+    QString pos2str(QPoint pos);
 private:
     Ui::MainWindow *ui;
     int gridSize, col, row, tagSize;

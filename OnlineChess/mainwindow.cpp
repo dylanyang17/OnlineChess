@@ -30,6 +30,42 @@ QChar MainWindow::ind2char(int a){
     return QChar(a+'a'-1) ;
 }
 
+int MainWindow::type2ind(QString s){
+    if(s=="king"){
+        return 1;
+    } else if(s=="queen"){
+        return 2;
+    } else if(s=="bishop"){
+        return 3;
+    } else if(s=="knight"){
+        return 4;
+    } else if(s=="rook"){
+        return 5;
+    } else if(s=="pawn"){
+        return 6;
+    } else{
+        return -1;
+    }
+}
+
+QString MainWindow::ind2type(int a){
+    if(a==1){
+        return "king" ;
+    } else if(a==2){
+        return "queen" ;
+    } else if(a==3){
+        return "bishop" ;
+    } else if(a==4){
+        return "knight" ;
+    } else if(a==5){
+        return "rook" ;
+    } else if(a==6){
+        return "pawn" ;
+    } else{
+        return "" ;
+    }
+}
+
 int MainWindow::getGroundType(int x, int y){
     //返回地面颜色（黑色为1，白色为0）
     return (x+y)%2^1 ;

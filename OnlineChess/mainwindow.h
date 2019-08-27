@@ -33,6 +33,8 @@ public:
     const static int COLORNUM=2 ;
     const static int MAXM=32; //最大棋子数
     const static int FLAGNOTRUN=0, FLAGWIN=1, FLAGLOSE=2, FLAGTIE=3, FLAGMYTURN=4, FLAGOPPTURN=5 ;
+    QList<QPoint> dir[COLORNUM][TYPENUM+1] ;  //存储每个颜色和种类的棋子可以朝哪些方向走 TODO  注意兵需要特殊处理
+    bool canWalkMore[TYPENUM+1] ;             //记录每个种类的棋子能否沿dir走多步 TODO
     void paintEvent(QPaintEvent *event);
     QPoint getPoint(int x, int y);
     int char2ind(QChar s);
@@ -53,18 +55,27 @@ public:
     void mousePressEvent(QMouseEvent *event);
     int getChessmanIndOnPos(QPoint pos);
     QList<QPoint> getCandidatePos(Chessman man);
+    void myMove(int ind, QPoint p);
+    QList<QPoint> calcNextCandidate(Chessman man);
+    bool outGridRange(QPoint pos);
 private slots:
     void on_actionLoadInit_triggered();
 
+    void on_actionLoadFromFile_triggered();
+
+    void on_actionSaveChess_triggered();
+
 private:
     Ui::MainWindow *ui;
-    int gridSize, col, row, tagSize;
+    int gridSize, col, row, tagSize, circleR;
     QPoint leftUp;
     QColor groundColor[2];                      //两种格子颜色
+    QColor circleColor;                         //圆环的颜色
     QList< Chessman> nowChessman;               //当前的棋子
     QString iniChessmanStr;                     //初始界面对应字符串
     QLabel *label[MAXM+5] ;                     //图像标签
-    QPoint nowChoose;
+    QPoint nowChoose;                           //我方当前选中的棋子
+    QList<QPoint> myNextCandidate;              //我方当前选中的棋子接下来可以走的位置
 };
 
 #endif // MAINWINDOW_H

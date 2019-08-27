@@ -36,6 +36,7 @@ public:
     const static int COLORNUM=2 ;
     const static int MAXM=32; //最大棋子数
     const static int STATUSNOTRUN=0, STATUSWIN=1, STATUSLOSE=2, STATUSTIE=3, STATUSMYTURN=4, STATUSOPPTURN=5 ;
+    const static int TYPEKING=1, TYPEQUEEN=2, TYPEBISHOP=3, TYPEKNIGHT=4, TYPEROOK=5, TYPEPAWN=6;
     QList<QPoint> dir[COLORNUM][TYPENUM+1] ;  //存储每个颜色和种类的棋子可以朝哪些方向走 TODO  注意兵需要特殊处理
     bool canWalkMore[TYPENUM+1] ;             //记录每个种类的棋子能否沿dir走多步 TODO
     void paintEvent(QPaintEvent *event);
@@ -63,6 +64,7 @@ public:
 
 
     void setStatus(int status);
+    void nextPlayer();
 private slots:
     void on_actionLoadInit_triggered();
 
@@ -85,6 +87,7 @@ private:
     QList<QPoint> myNextCandidate;              //我方当前选中的棋子接下来可以走的位置
     LocalPlayer *localPlayer[2];                //两名本地玩家
     Player *player[2] ;                         //两名玩家
+    int nowPlayerInd;                           //现在正在下棋的玩家索引
    // OnlinePlayer *onlinePlayer;                 //在线玩家
 };
 

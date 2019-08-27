@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     groundColor[1] = QColor(181,135,99) ;
     circleColor = QColor(99,181,176);
     iniChessmanStr = QString("white\nking 1 e1\nqueen 1 d1\nbishop 2 c1 f1\nknight 2 b1 g1\nrook 2 a1 h1\npawn 8 a2 b2 c2 d2 e2 f2 g2 h2\nblack\nking 1 e8\nqueen 1 d8\nbishop 2 c8 f8\nknight 2 b8 g8\nrook 2 a8 h8\npawn 8 a7 b7 c7 d7 e7 f7 g7 h7") ;
+    on_actionLoadInit_triggered();
     for(int i=0;i<MAXM;++i){
         label[i] = new QLabel(this) ;
     }
@@ -151,11 +152,12 @@ void MainWindow::paintEvent(QPaintEvent *event){
 void MainWindow::myMove(int ind, QPoint p){
     //我方的移动操作，将索引为ind的棋子移动到p位置
     int tmpInd = getChessmanIndOnPos(p) ;
-    if(tmpInd!=-1){
-        nowChessman.removeAt(tmpInd) ;
-    }
     Chessman man = nowChessman.at(ind) ;
     man.pos = p ;
+    nowChessman.replace(ind, man);
+    if(tmpInd!=-1){ //注意删除后会导致索引改变
+        nowChessman.removeAt(tmpInd) ;
+    }
 
     //此处还要检查胜负和升变 TODO
 }
@@ -177,11 +179,21 @@ QList<QPoint> MainWindow::getCandidatePos(Chessman man){
             if(outGridRange(newPos)) break ;
             int tmpInd = getChessmanIndOnPos(newPos) ;
             if(tmpInd==-1 || nowChessman.at(tmpInd).color!=color){ //可移动
+                if(type==TYPEPAWN && tmpInd!=-1) //pawn不可直接吃
+                    continue;
                 list.append(newPos) ;
             }
             if(tmpInd!=-1) break ; //被遮挡
         }
     }
+    if(type==TYPEPAWN){
+        QPoint d = dir[color][type].at(0) , newPos = pos+2*d;
+        if(getChessmanIndOnPos(pos+d)==-1 && getChessmanIndOnPos(newPos)==-1 && !outGridRange(newPos)){
+            list.append(newPos);
+        }
+    }
+
+    //注意特殊处理pawn TODO
     return list;
 }
 
@@ -226,8 +238,12 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
                     bool suc=false ;
                     for(int i=0;i<myNextCandidate.length();++i){
                         if(myNextCandidate.at(i) == QPoint(x,y)){
-                            myMove(ind, QPoint(x,y)) ;
+                            debug("test1");
+                            myMove(getChessmanIndOnPos(nowChoose), QPoint(x,y)) ;
+                            debug("test2");
                             suc=true;
+                            nextPlayer() ;
+                            debug("test3");
                             break;
                         }
                     }
@@ -242,11 +258,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
             if(nowChoose != QPoint(-1,-1)){
                 int ind = getChessmanIndOnPos(nowChoose) ;
                 myNextCandidate = getCandidatePos(nowChessman.at(ind));
-                update();
             } else{
                 myNextCandidate.clear();
             }
         }
+        update();
     }
 }
 
@@ -400,6 +416,11 @@ int MainWindow::getGroundType(int x, int y){
     return (x+y)%2^1 ;
 }
 
+void MainWindow::nextPlayer(){
+    nowPlayerInd^=1;
+    player[nowPlayerInd]->play();
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -444,7 +465,9 @@ void MainWindow::on_actionPVP_triggered()
     setStatus(STATUSMYTURN) ;
     player[0] = dynamic_cast<Player*>(localPlayer[0]);
     player[1] = dynamic_cast<Player*>(localPlayer[1]);
+    nowPlayerInd = 0;
     if(nowColor!=player[0]->getColor()){
         std::swap(player[0],player[1]);
     }
+    player[0]->play();
 }

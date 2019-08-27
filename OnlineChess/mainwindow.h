@@ -51,7 +51,8 @@ public:
 
     int gameFlag, nowColor ;
     void mousePressEvent(QMouseEvent *event);
-    Chessman chessmanOnPos(QPoint pos);
+    int getChessmanIndOnPos(QPoint pos);
+    QList<QPoint> getCandidatePos(Chessman man);
 private slots:
     void on_actionLoadInit_triggered();
 

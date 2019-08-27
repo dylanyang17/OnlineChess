@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     col=row=8;
     leftUp = QPoint(50,50) ;
     groundColor[0] = QColor(240,218,181) ;
-    groundColor[1] = QColor(185,131,99) ;
+    groundColor[1] = QColor(181,135,99) ;
     iniChessmanStr = QString("white\nking 1 e1\nqueen 1 d1\nbishop 2 c1 f1\nknight 2 b1 g1\nrook 2 a1 h1\npawn 8 a2 b2 c2 d2 e2 f2 g2 h2\nblack\nking 1 e8\nqueen 1 d8\nbishop 2 c8 f8\nknight 2 b8 g8\nrook 2 a8 h8\npawn 8 a7 b7 c7 d7 e7 f7 g7 h7") ;
     for(int i=0;i<MAXM;++i){
         label[i] = new QLabel(this) ;
@@ -88,14 +88,34 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         if(gameFlag==FLAGMYTURN){
             if(nowChoose == QPoint(x,y)){
                 nowChoose = QPoint(-1,-1);
-                return ;
+            } else if(nowChoose == QPoint(-1,-1)){
+                int ind = getChessmanIndOnPos(QPoint(x,y)) ;
+                if(ind==-1) return ;
+                Chessman man = nowChessman.at(ind) ;
+                if(man.color == nowColor){
+                    nowChoose = QPoint(x,y) ;
+                }
+            } else{
+                //之前已经选中过某个棋子
             }
         }
     }
 }
 
-Chessman MainWindow::chessmanOnPos(QPoint pos){
-    //返回某个位置上的Chessman
+QList<QPoint> MainWindow::getCandidatePos(Chessman man){
+    //返回棋子man可以移动的位置列表
+}
+
+int MainWindow::getChessmanIndOnPos(QPoint pos){
+    //返回某个位置上的Chessman索引
+    int ret=-1 ;
+    for(int i=0;i<nowChessman.length();++i){
+        if(nowChessman.at(i).pos == pos){
+            ret = i ;
+            break ;
+        }
+    }
+    return ret;
 }
 
 void MainWindow::debug(QString s){
@@ -190,7 +210,7 @@ QString MainWindow::chessman2str(QList< Chessman> &list){
 
 QString MainWindow::getChessStr(){
     //把当前局面转化为字符串
-    QString ret = "white\n" ;
+    QString ret = (nowColor ? "black\n" : "white\n") ;
     QList< Chessman> tmpList[COLORNUM+1][TYPENUM+1] ;
     for(int i=0;i<nowChessman.length();++i){
          Chessman man = nowChessman.at(i) ;
@@ -200,7 +220,7 @@ QString MainWindow::getChessStr(){
         QString tmp = chessman2str(tmpList[0][i]) ;
         if(tmp!="") ret = ret + tmp + "\n" ;
     }
-    ret = ret + "black\n" ;
+    ret = ret + (nowColor ? "white\n" : "black\n") ;
     for(int i=1;i<=TYPENUM;++i){
         QString tmp = chessman2str(tmpList[1][i]) ;
         if(tmp!="") ret = ret + tmp + "\n" ;
@@ -226,6 +246,7 @@ void MainWindow::loadChessStr(QString chessStr){
         ++now ;
     }
     nowChessman = list ;
+    nowColor = color^1 ;
     update() ;
 }
 

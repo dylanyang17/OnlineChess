@@ -210,6 +210,7 @@ Makefile: ../OnlineChess/OnlineChess.pro C:/Applications/QT/Qt5.12.4/5.12.4/ming
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/qt_config.prf \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/win32-g++/qmake.conf \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/exclusive_builds.prf \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/toolchain.prf \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/default_pre.prf \
@@ -385,6 +386,7 @@ C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/qt_functions.prf:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/qt_config.prf:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/win32-g++/qmake.conf:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/exclusive_builds.prf:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/toolchain.prf:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/default_pre.prf:

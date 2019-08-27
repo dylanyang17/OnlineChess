@@ -24,9 +24,13 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
+    QAction *actionLoadInit;
+    QAction *actionLoadFromFile;
+    QAction *actionSaveChess;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menu;
+    QMenu *menu_2;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -35,14 +39,22 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(865, 647);
+        actionLoadInit = new QAction(MainWindow);
+        actionLoadInit->setObjectName(QString::fromUtf8("actionLoadInit"));
+        actionLoadFromFile = new QAction(MainWindow);
+        actionLoadFromFile->setObjectName(QString::fromUtf8("actionLoadFromFile"));
+        actionSaveChess = new QAction(MainWindow);
+        actionSaveChess->setObjectName(QString::fromUtf8("actionSaveChess"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 865, 26));
+        menuBar->setGeometry(QRect(0, 0, 865, 23));
         menu = new QMenu(menuBar);
         menu->setObjectName(QString::fromUtf8("menu"));
+        menu_2 = new QMenu(menu);
+        menu_2->setObjectName(QString::fromUtf8("menu_2"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
@@ -52,6 +64,11 @@ public:
         MainWindow->setStatusBar(statusBar);
 
         menuBar->addAction(menu->menuAction());
+        menu->addAction(menu_2->menuAction());
+        menu->addAction(actionSaveChess);
+        menu->addSeparator();
+        menu_2->addAction(actionLoadInit);
+        menu_2->addAction(actionLoadFromFile);
 
         retranslateUi(MainWindow);
 
@@ -61,7 +78,11 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", nullptr));
+        actionLoadInit->setText(QApplication::translate("MainWindow", "\345\210\235\345\247\213\345\261\200\351\235\242", nullptr));
+        actionLoadFromFile->setText(QApplication::translate("MainWindow", "\344\273\216\346\226\207\344\273\266\350\275\275\345\205\245..", nullptr));
+        actionSaveChess->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\345\261\200\351\235\242", nullptr));
         menu->setTitle(QApplication::translate("MainWindow", "\346\270\270\346\210\217", nullptr));
+        menu_2->setTitle(QApplication::translate("MainWindow", "\350\275\275\345\205\245\345\261\200\351\235\242", nullptr));
     } // retranslateUi
 
 };

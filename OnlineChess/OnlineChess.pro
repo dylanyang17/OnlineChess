@@ -25,11 +25,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        localplayer.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        player.cpp
 
 HEADERS += \
-        mainwindow.h
+        localplayer.h \
+        mainwindow.h \
+        player.h
 
 FORMS += \
         mainwindow.ui
@@ -38,3 +42,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    res.qrc

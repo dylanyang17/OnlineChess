@@ -10,6 +10,9 @@ namespace Ui {
 class MainWindow;
 }
 
+class Player;
+class LocalPlayer;
+
 struct  Chessman{
     //type: 1 king ; 2 queen ; 3 bishop ; 4 knight ; 5 rook ; 6 pawn
     //color: 0 white ; 1 black
@@ -32,7 +35,7 @@ public:
     const static int TYPENUM=6 ;
     const static int COLORNUM=2 ;
     const static int MAXM=32; //最大棋子数
-    const static int FLAGNOTRUN=0, FLAGWIN=1, FLAGLOSE=2, FLAGTIE=3, FLAGMYTURN=4, FLAGOPPTURN=5 ;
+    const static int STATUSNOTRUN=0, STATUSWIN=1, STATUSLOSE=2, STATUSTIE=3, STATUSMYTURN=4, STATUSOPPTURN=5 ;
     QList<QPoint> dir[COLORNUM][TYPENUM+1] ;  //存储每个颜色和种类的棋子可以朝哪些方向走 TODO  注意兵需要特殊处理
     bool canWalkMore[TYPENUM+1] ;             //记录每个种类的棋子能否沿dir走多步 TODO
     void paintEvent(QPaintEvent *event);
@@ -50,14 +53,16 @@ public:
     void loadChessStr(QString s);
     void debug(QString s);
     bool isRunning() ;
-
-    int gameFlag, nowColor ;
     void mousePressEvent(QMouseEvent *event);
     int getChessmanIndOnPos(QPoint pos);
-    QList<QPoint> getCandidatePos(Chessman man);
     void myMove(int ind, QPoint p);
-    QList<QPoint> calcNextCandidate(Chessman man);
+    QList<QPoint> getCandidatePos(Chessman man);
     bool outGridRange(QPoint pos);
+
+    int nowColor ;
+
+
+    void setStatus(int status);
 private slots:
     void on_actionLoadInit_triggered();
 
@@ -65,9 +70,11 @@ private slots:
 
     void on_actionSaveChess_triggered();
 
+    void on_actionPVP_triggered();
+
 private:
     Ui::MainWindow *ui;
-    int gridSize, col, row, tagSize, circleR;
+    int gridSize, col, row, tagSize, circleR, nowStatus;
     QPoint leftUp;
     QColor groundColor[2];                      //两种格子颜色
     QColor circleColor;                         //圆环的颜色
@@ -76,6 +83,9 @@ private:
     QLabel *label[MAXM+5] ;                     //图像标签
     QPoint nowChoose;                           //我方当前选中的棋子
     QList<QPoint> myNextCandidate;              //我方当前选中的棋子接下来可以走的位置
+    LocalPlayer *localPlayer[2];                //两名本地玩家
+    Player *player[2] ;                         //两名玩家
+   // OnlinePlayer *onlinePlayer;                 //在线玩家
 };
 
 #endif // MAINWINDOW_H

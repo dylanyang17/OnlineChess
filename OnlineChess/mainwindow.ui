@@ -37,6 +37,8 @@
     <addaction name="menu_2"/>
     <addaction name="actionSaveChess"/>
     <addaction name="separator"/>
+    <addaction name="actionPVP"/>
+    <addaction name="actionOnline"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -62,6 +64,16 @@
   <action name="actionSaveChess">
    <property name="text">
     <string>保存局面</string>
+   </property>
+  </action>
+  <action name="actionPVP">
+   <property name="text">
+    <string>双人对弈</string>
+   </property>
+  </action>
+  <action name="actionOnline">
+   <property name="text">
+    <string>联机对弈</string>
    </property>
   </action>
  </widget>

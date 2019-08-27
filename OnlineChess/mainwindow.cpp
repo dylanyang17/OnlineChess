@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "player.h"
+#include "localplayer.h"
 #include <QPainter>
 #include <QFile>
 #include <QDebug>
@@ -25,10 +27,13 @@ MainWindow::MainWindow(QWidget *parent) :
     for(int i=0;i<MAXM;++i){
         label[i] = new QLabel(this) ;
     }
-    gameFlag = FLAGNOTRUN;
+    setStatus(STATUSNOTRUN) ;
     nowChoose = QPoint(-1,-1);
     memset(canWalkMore,0,sizeof(canWalkMore)) ;
     canWalkMore[2]=canWalkMore[3]=canWalkMore[5]=true;
+
+    localPlayer[0] = new LocalPlayer(this, 0) ;
+    localPlayer[1] = new LocalPlayer(this, 1) ;
 
     //king
     dir[0][1].append(QPoint(-1,0)) ;
@@ -159,7 +164,7 @@ bool MainWindow::outGridRange(QPoint pos){
     return pos.x()<1||pos.y()<1||pos.x()>col||pos.y()>row;
 }
 
-QList<QPoint> MainWindow::calcNextCandidate(Chessman man){
+QList<QPoint> MainWindow::getCandidatePos(Chessman man){
     //计算棋子下一步能走的所有位置
     QList<QPoint> list;
     int type = man.type, color = man.color;
@@ -180,6 +185,21 @@ QList<QPoint> MainWindow::calcNextCandidate(Chessman man){
     return list;
 }
 
+void MainWindow::setStatus(int status){
+    nowStatus = status;
+    if(isRunning()){
+        ui->actionLoadInit->setEnabled(false);
+        ui->actionLoadFromFile->setEnabled(false);
+        ui->actionPVP->setEnabled(false);
+        ui->actionOnline->setEnabled(false);
+    } else{
+        ui->actionLoadInit->setEnabled(true);
+        ui->actionLoadFromFile->setEnabled(true);
+        ui->actionPVP->setEnabled(true);
+        ui->actionOnline->setEnabled(true);
+    }
+}
+
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton){
@@ -189,7 +209,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         y=row+1-y;
         if(x<1||y<1||x>col||y>row||event->x()<leftUp.x()||event->y()<leftUp.y())  return ;
         debug(QString("Press: (%1,%2)").arg(x).arg(y)) ;
-        if(gameFlag==FLAGMYTURN){
+        if(nowStatus==STATUSMYTURN){
             if(nowChoose == QPoint(x,y)){
                 //选中了上次选中的棋子
                 nowChoose = QPoint(-1,-1);
@@ -221,17 +241,13 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
             if(nowChoose != QPoint(-1,-1)){
                 int ind = getChessmanIndOnPos(nowChoose) ;
-                myNextCandidate = calcNextCandidate(nowChessman.at(ind));
+                myNextCandidate = getCandidatePos(nowChessman.at(ind));
                 update();
             } else{
                 myNextCandidate.clear();
             }
         }
     }
-}
-
-QList<QPoint> MainWindow::getCandidatePos(Chessman man){
-    //返回棋子man可以移动的位置列表
 }
 
 int MainWindow::getChessmanIndOnPos(QPoint pos){
@@ -253,7 +269,7 @@ void MainWindow::debug(QString s){
 
 bool MainWindow::isRunning()
 {
-    return gameFlag==FLAGMYTURN || gameFlag==FLAGOPPTURN ;
+    return nowStatus==STATUSMYTURN || nowStatus==STATUSOPPTURN ;
 }
 
 QPoint MainWindow::getPoint(int x, int y){
@@ -421,4 +437,14 @@ void MainWindow::on_actionSaveChess_triggered()
     QTextStream out(&file);
     out << getChessStr();
     file.close();
+}
+
+void MainWindow::on_actionPVP_triggered()
+{
+    setStatus(STATUSMYTURN) ;
+    player[0] = dynamic_cast<Player*>(localPlayer[0]);
+    player[1] = dynamic_cast<Player*>(localPlayer[1]);
+    if(nowColor!=player[0]->getColor()){
+        std::swap(player[0],player[1]);
+    }
 }

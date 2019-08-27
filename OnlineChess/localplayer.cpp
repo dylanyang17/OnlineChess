@@ -11,6 +11,6 @@ LocalPlayer::~LocalPlayer()
 }
 
 void LocalPlayer::play(){
-    mainWindow->gameFlag = MainWindow::FLAGMYTURN ;
+    mainWindow->setStatus(MainWindow::STATUSMYTURN) ;
     mainWindow->nowColor = color ;
 }

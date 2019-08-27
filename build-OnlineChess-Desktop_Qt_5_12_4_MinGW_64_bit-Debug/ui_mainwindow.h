@@ -27,6 +27,8 @@ public:
     QAction *actionLoadInit;
     QAction *actionLoadFromFile;
     QAction *actionSaveChess;
+    QAction *actionPVP;
+    QAction *actionOnline;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menu;
@@ -45,6 +47,10 @@ public:
         actionLoadFromFile->setObjectName(QString::fromUtf8("actionLoadFromFile"));
         actionSaveChess = new QAction(MainWindow);
         actionSaveChess->setObjectName(QString::fromUtf8("actionSaveChess"));
+        actionPVP = new QAction(MainWindow);
+        actionPVP->setObjectName(QString::fromUtf8("actionPVP"));
+        actionOnline = new QAction(MainWindow);
+        actionOnline->setObjectName(QString::fromUtf8("actionOnline"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -67,6 +73,8 @@ public:
         menu->addAction(menu_2->menuAction());
         menu->addAction(actionSaveChess);
         menu->addSeparator();
+        menu->addAction(actionPVP);
+        menu->addAction(actionOnline);
         menu_2->addAction(actionLoadInit);
         menu_2->addAction(actionLoadFromFile);
 
@@ -81,6 +89,8 @@ public:
         actionLoadInit->setText(QApplication::translate("MainWindow", "\345\210\235\345\247\213\345\261\200\351\235\242", nullptr));
         actionLoadFromFile->setText(QApplication::translate("MainWindow", "\344\273\216\346\226\207\344\273\266\350\275\275\345\205\245..", nullptr));
         actionSaveChess->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\345\261\200\351\235\242", nullptr));
+        actionPVP->setText(QApplication::translate("MainWindow", "\345\217\214\344\272\272\345\257\271\345\274\210", nullptr));
+        actionOnline->setText(QApplication::translate("MainWindow", "\350\201\224\346\234\272\345\257\271\345\274\210", nullptr));
         menu->setTitle(QApplication::translate("MainWindow", "\346\270\270\346\210\217", nullptr));
         menu_2->setTitle(QApplication::translate("MainWindow", "\350\275\275\345\205\245\345\261\200\351\235\242", nullptr));
     } // retranslateUi

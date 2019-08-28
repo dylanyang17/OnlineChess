@@ -63,7 +63,7 @@ public:
     bool isRunning() ;
     void mousePressEvent(QMouseEvent *event);
     int getChessmanIndOnPos(QPoint pos);
-    void myMove(int ind, QPoint p);
+    void moveChessman(int ind, QPoint p);
     QList<QPoint> getCandidatePos(Chessman man);
     bool outGridRange(QPoint pos);
 
@@ -95,18 +95,21 @@ private slots:
 private:
     Ui::MainWindow *ui;
     int gridSize, col, row, tagSize, circleR, nowStatus;
-    QPoint leftUp;
+    QPoint upgradeLeftUp;                       //升变框的左上角
+    QPoint leftUp;                              //棋盘左上角
     QColor groundColor[2];                      //两种格子颜色
     QColor circleColor;                         //圆环的颜色
     QList< Chessman> nowChessman;               //当前的棋子
     QString iniChessmanStr;                     //初始界面对应字符串
     QLabel *label[MAXM+5] ;                     //图像标签
+    QLabel *upgradeLabel[4];                    //升变图像标签
     QList<QPoint> myNextCandidate;              //我方当前选中的棋子接下来可以走的位置
     LocalPlayer *localPlayer[2];                //两名本地玩家
     Player *player[2] ;                         //两名玩家
     QTimer *playTimer ;                         //着子的计时器
     int nowPlayerInd;                           //现在正在下棋的玩家索引
     int timeLim, timeRes;                       //时间限制和剩余
+    int upgradingInd;                           //正在进行兵升变的棋子索引
    // OnlinePlayer *onlinePlayer;               //在线玩家
 };
 

@@ -8,6 +8,7 @@
 #include <QColor>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <cmath>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,14 +22,15 @@ MainWindow::MainWindow(QWidget *parent) :
     circleR=gridSize/3;
     col=row=8;
     leftUp = QPoint(50,100) ;
+    upgradeLeftUp=getPoint(3,6) ;
     groundColor[0] = QColor(240,218,181) ;
     groundColor[1] = QColor(181,135,99) ;
     circleColor = QColor(99,181,176);
     iniChessmanStr = QString("white\nking 1 e1\nqueen 1 d1\nbishop 2 c1 f1\nknight 2 b1 g1\nrook 2 a1 h1\npawn 8 a2 b2 c2 d2 e2 f2 g2 h2\nblack\nking 1 e8\nqueen 1 d8\nbishop 2 c8 f8\nknight 2 b8 g8\nrook 2 a8 h8\npawn 8 a7 b7 c7 d7 e7 f7 g7 h7") ;
     on_actionLoadInit_triggered();
-    for(int i=0;i<MAXM;++i){
-        label[i] = new QLabel(this) ;
-    }
+    upgradingInd=-1;
+    for(int i=0;i<MAXM;++i) label[i] = new QLabel(this) ;
+    for(int i=0;i<4;++i) upgradeLabel[i] = new QLabel(this);
     nowChoose = QPoint(-1,-1);
     memset(canWalkMore,0,sizeof(canWalkMore)) ;
     canWalkMore[2]=canWalkMore[3]=canWalkMore[5]=true;
@@ -136,6 +138,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
         label[i]->setPixmap(QPixmap(path)) ;
         label[i]->setGeometry(QRect(getPoint(pos.x(),pos.y()+1), getPoint(pos.x()+1,pos.y()))) ;
         label[i]->setScaledContents(true) ;
+        label[i]->lower();
         label[i]->show();
     }
     for(int i=nowChessman.length();i<MAXM;++i)
@@ -151,10 +154,46 @@ void MainWindow::paintEvent(QPaintEvent *event){
         int margin=(gridSize-2*circleR)/2;
         painter.drawArc(QRect(getPoint(p.x(),p.y()+1)+QPoint(margin,margin),getPoint(p.x()+1,p.y())+QPoint(-margin,-margin)),0,360*16) ;
     }
+
+    //升变
+    if(upgradingInd!=-1){
+        for(int i=0;i<nowChessman.size();++i){
+            QPoint pos = nowChessman.at(i).pos ;
+            if(pos.x()>=3 && pos.x()<=6 && pos.y()>=3 && pos.y()<=4)
+                label[i]->hide();
+        }
+        int color = nowChessman.at(upgradingInd).color;
+        QPen pen = painter.pen();
+        pen.setColor(groundColor[1]) ;
+        pen.setWidth(3);
+        painter.setPen(pen);
+        painter.setBrush(QBrush(groundColor[0],Qt::SolidPattern));
+        painter.drawRoundedRect(QRect(upgradeLeftUp,upgradeLeftUp+QPoint(4*gridSize,2*gridSize)),
+                                15,15) ;
+        for(int i=2;i<=5;++i){
+            QString path = ":/new/prefix1/res/" + QString(color ? "black_" : "white_") + ind2type(i) + ".png";
+            QPoint pos = getPoint(3+i-2,6) + QPoint(0,gridSize/2) ;
+            upgradeLabel[i-2]->setPixmap(QPixmap(path)) ;
+            upgradeLabel[i-2]->setGeometry(QRect(pos, pos+QPoint(gridSize,gridSize))) ;
+            upgradeLabel[i-2]->setScaledContents(true) ;
+            upgradeLabel[i-2]->lower();
+            upgradeLabel[i-2]->show();
+            QPen pen = painter.pen();
+            pen.setColor(groundColor[1]) ;
+            pen.setWidth(1);
+            painter.setPen(pen);
+            painter.setBrush(Qt::NoBrush);
+            QPoint margin=QPoint(3,3);
+            painter.drawRoundedRect(QRect(pos+margin, pos+QPoint(gridSize,gridSize)-margin),10,10) ;
+        }
+    } else{
+        for(int i=0;i<4;++i)
+            upgradeLabel[i]->hide();
+    }
 }
 
-void MainWindow::myMove(int ind, QPoint p){
-    //我方的移动操作，将索引为ind的棋子移动到p位置
+void MainWindow::moveChessman(int ind, QPoint p){
+    //移动操作，将索引为ind的棋子移动到p位置，注意可能只是作为测试移动而被其它函数调用
     int tmpInd = getChessmanIndOnPos(p) ;
     Chessman man = nowChessman.at(ind) ;
     man.pos = p ;
@@ -162,8 +201,6 @@ void MainWindow::myMove(int ind, QPoint p){
     if(tmpInd!=-1){ //注意删除后会导致索引改变
         nowChessman.removeAt(tmpInd) ;
     }
-
-    //此处还要检查胜负和升变 TODO
 }
 
 bool MainWindow::outGridRange(QPoint pos){
@@ -227,7 +264,7 @@ QList<QPoint> MainWindow::getCandidatePosWithCheck(Chessman man){
     while(it!=list.end()){
         QPoint newPos = *it;
         QList<Chessman> tmpNowChessman = nowChessman; //备份nowChessman
-        myMove(ind, newPos) ;
+        moveChessman(ind, newPos) ;
         int ck = isCheck() ;
         nowChessman = tmpNowChessman ;
         if(ck & (man.color ? CHECKBLACK : CHECKWHITE)){
@@ -256,6 +293,7 @@ void MainWindow::setStatus(int status){
     timeRes = timeLim ;
     ui->lcdNumber->display(timeRes) ;
     playTimer->stop() ;
+    upgradingInd = -1;
     if(isRunning()){
         ui->actionLoadInit->setEnabled(false);
         ui->actionLoadFromFile->setEnabled(false);
@@ -278,7 +316,7 @@ void MainWindow::setStatus(int status){
     } else if(status==STATUSBLACKWIN){
         QMessageBox::information(this, "游戏结束", "黑方胜利!") ;
     } else if(status==STATUSTIE){
-        QMessageBox::information(this, "游戏结束", "平局!") ;
+        QMessageBox::information(this, "游戏结束", "和棋!") ;
     }
     update() ;
 }
@@ -329,11 +367,28 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton){
         int x=event->x(), y=event->y() ;
-        x=(x-leftUp.x())/gridSize+1;
-        y=(y-leftUp.y())/gridSize+1;
+        if(upgradingInd!=-1){
+            //兵升变
+            QPoint p = upgradeLeftUp + QPoint(0, gridSize/2) ;
+            x=static_cast<int>(std::floor(static_cast<double>(x-p.x())/gridSize)+1);
+            y=static_cast<int>(std::floor(static_cast<double>(y-p.y())/gridSize)+1);
+            debug(QString("Press: (%1,%2)").arg(x).arg(y)) ;
+            if(y==1 && x>=1 && x<=4){
+                int type=x+1 ;
+                Chessman man = nowChessman.at(upgradingInd) ;
+                man.type = type;
+                nowChessman.replace(upgradingInd, man) ;
+                upgradingInd = -1;
+                update();
+                nextPlayer();
+            }
+            return ;
+        }
+        x=static_cast<int>(std::floor(static_cast<double>(x-leftUp.x())/gridSize)+1);
+        y=static_cast<int>(std::floor(static_cast<double>(y-leftUp.y())/gridSize)+1);
         y=row+1-y;
-        if(x<1||y<1||x>col||y>row||event->x()<leftUp.x()||event->y()<leftUp.y())  return ;
         debug(QString("Press: (%1,%2)").arg(x).arg(y)) ;
+        if(x<1||y<1||x>col||y>row)  return ;
         if(nowStatus==STATUSMYTURN){
             if(nowChoose == QPoint(x,y)){
                 //选中了上次选中的棋子
@@ -351,13 +406,20 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
                     bool suc=false ;
                     for(int i=0;i<myNextCandidate.length();++i){
                         if(myNextCandidate.at(i) == QPoint(x,y)){
-                            //debug("test1");
-                            myMove(getChessmanIndOnPos(nowChoose), QPoint(x,y)) ;
-                            //debug("test2");
                             suc=true;
-                            nextPlayer() ;
-                            //debug("test3");
+                            int ind = getChessmanIndOnPos(nowChoose);
+                            moveChessman(ind, QPoint(x,y)) ; //可能导致吃子进而索引改变
                             nowChoose = QPoint(-1,-1) ;
+
+                            //处理兵升变
+                            ind = getChessmanIndOnPos(QPoint(x,y));
+                            Chessman man = nowChessman.at(ind) ;
+                            if(man.type==TYPEPAWN && getPawnStatus(man)==PAWNUPGRADE){
+                                upgradingInd = ind ;
+                                break ;
+                            }
+
+                            nextPlayer() ;
                             break;
                         }
                     }

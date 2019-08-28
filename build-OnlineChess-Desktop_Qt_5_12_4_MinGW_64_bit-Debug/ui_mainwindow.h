@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLCDNumber>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -35,6 +36,8 @@ public:
     QAction *actionDebug;
     QWidget *centralWidget;
     QLCDNumber *lcdNumber;
+    QLabel *labelNowColor;
+    QLabel *labelMyColor;
     QMenuBar *menuBar;
     QMenu *menu;
     QMenu *menu_5;
@@ -72,6 +75,12 @@ public:
         lcdNumber = new QLCDNumber(centralWidget);
         lcdNumber->setObjectName(QString::fromUtf8("lcdNumber"));
         lcdNumber->setGeometry(QRect(200, 10, 101, 41));
+        labelNowColor = new QLabel(centralWidget);
+        labelNowColor->setObjectName(QString::fromUtf8("labelNowColor"));
+        labelNowColor->setGeometry(QRect(359, 28, 181, 16));
+        labelMyColor = new QLabel(centralWidget);
+        labelMyColor->setObjectName(QString::fromUtf8("labelMyColor"));
+        labelMyColor->setGeometry(QRect(70, 30, 101, 16));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -125,6 +134,8 @@ public:
         actionCreateHost->setText(QApplication::translate("MainWindow", "\345\210\233\345\273\272\344\270\273\346\234\272", nullptr));
         actionConnectHost->setText(QApplication::translate("MainWindow", "\350\277\236\346\216\245\344\270\273\346\234\272", nullptr));
         actionDebug->setText(QApplication::translate("MainWindow", "\345\274\200\345\220\257\350\260\203\350\257\225", nullptr));
+        labelNowColor->setText(QApplication::translate("MainWindow", "\346\211\247\345\255\220\346\226\271\357\274\232", nullptr));
+        labelMyColor->setText(QApplication::translate("MainWindow", "\346\210\221\346\226\271\357\274\232", nullptr));
         menu->setTitle(QApplication::translate("MainWindow", "\346\270\270\346\210\217", nullptr));
         menu_5->setTitle(QApplication::translate("MainWindow", "\350\201\224\346\234\272\345\257\271\345\274\210", nullptr));
         menu_3->setTitle(QApplication::translate("MainWindow", "\345\261\200\351\235\242", nullptr));

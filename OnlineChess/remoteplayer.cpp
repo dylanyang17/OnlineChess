@@ -9,8 +9,8 @@ RemotePlayer::RemotePlayer(MainWindow *mainWindow, int _color) : Player(mainWind
 void RemotePlayer::play()
 {
     mainWindow->nowChoose = QPoint(-1,-1) ;
-    mainWindow->setStatus(MainWindow::STATUSOPPTURN) ;
     mainWindow->nowColor = color ;
+    mainWindow->setStatus(MainWindow::STATUSOPPTURN) ;
 }
 
 void RemotePlayer::gameEnd(int status)

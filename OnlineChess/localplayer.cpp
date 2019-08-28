@@ -12,8 +12,8 @@ LocalPlayer::~LocalPlayer()
 
 void LocalPlayer::play(){
     mainWindow->nowChoose = QPoint(-1,-1) ;
-    mainWindow->setStatus(MainWindow::STATUSMYTURN) ;
     mainWindow->nowColor = color ;
+    mainWindow->setStatus(MainWindow::STATUSMYTURN) ;
     mainWindow->checkGameStatus() ;
 }
 

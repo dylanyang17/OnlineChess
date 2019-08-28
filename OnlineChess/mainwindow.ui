@@ -24,6 +24,32 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="labelNowColor">
+    <property name="geometry">
+     <rect>
+      <x>359</x>
+      <y>28</y>
+      <width>181</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>执子方：</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelMyColor">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>30</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>我方：</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

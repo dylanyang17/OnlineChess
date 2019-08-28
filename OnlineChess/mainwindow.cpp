@@ -379,6 +379,8 @@ void MainWindow::setStatus(int status){
         ui->actionConnectHost->setEnabled(false);
         ui->actionCreateHost->setEnabled(false);
         playTimer->start(1000) ;
+        ui->labelMyColor->setText(QString("我方：") + (remotePlayer->getColor() ? "白方" : "黑方")) ;
+        ui->labelNowColor->setText(QString("执子方：") + (nowColor ? "黑方" : "白方")) ;
     } else{
         ui->actionLoadInit->setEnabled(true);
         ui->actionLoadFromFile->setEnabled(true);
@@ -691,10 +693,9 @@ void MainWindow::loadChessStr(QString chessStr){
         ++now ;
     }
     nowChessman = list ;
-    nowColor = color^1 ;
-    nowPlayerInd = color^1;
-    if(isRunning() && isPlayingOnline){
-        setStatus((nowColor==remotePlayer->getColor())? STATUSOPPTURN : STATUSMYTURN) ;
+    nowColor = color^1;
+    if(isRunning()){
+        player[nowColor]->play();
     }
     update() ;
 }
@@ -705,8 +706,7 @@ int MainWindow::getGroundType(int x, int y){
 }
 
 void MainWindow::nextPlayer(){
-    nowPlayerInd^=1;
-    player[nowPlayerInd]->play();
+    player[nowColor^1]->play();
 }
 
 void MainWindow::handleRead(){
@@ -720,7 +720,6 @@ void MainWindow::handleRead(){
             return;
         }
         loadChessStr(s) ;
-        nextPlayer();
     }
 }
 
@@ -740,10 +739,10 @@ void MainWindow::startOnlineGame(QTcpSocket *tcpSocket, int color){
     player[color^1] = remotePlayer ;
     if(!color){
         sendMessage(getChessStr()) ;
-        player[nowPlayerInd]->play();
+        player[nowColor]->play();
     } else{
-        nowPlayerInd=0 ;
-        player[nowPlayerInd]->play();
+        nowColor=0 ;
+        player[nowColor]->play();
     }
 }
 
@@ -791,7 +790,7 @@ void MainWindow::on_actionPVP_triggered()
     setStatus(STATUSMYTURN) ;
     player[0] = dynamic_cast<Player*>(localPlayer[0]);
     player[1] = dynamic_cast<Player*>(localPlayer[1]);
-    nowPlayerInd = 0;
+    nowColor = 0;
     if(nowColor!=player[0]->getColor()){
         std::swap(player[0],player[1]);
     }

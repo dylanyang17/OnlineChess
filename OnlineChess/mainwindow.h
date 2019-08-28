@@ -124,7 +124,6 @@ private:
     LocalPlayer *localPlayer[2];                //两名本地玩家
     Player *player[2] ;                         //两名玩家
     QTimer *playTimer ;                         //着子的计时器
-    int nowPlayerInd;                           //现在正在下棋的玩家索引
     int timeLim, timeRes;                       //时间限制和剩余
     int upgradingInd;                           //正在进行兵升变的棋子索引
     RemotePlayer *remotePlayer;                 //远程玩家

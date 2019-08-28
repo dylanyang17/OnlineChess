@@ -66,8 +66,8 @@ public:
     QList<QPoint> getCandidatePos(Chessman man);
     bool outGridRange(QPoint pos);
 
-    int nowColor ;
-
+    int nowColor ;                              //当前走子方的颜色
+    QPoint nowChoose;                           //我方当前选中的棋子
 
     void setStatus(int status);
     void nextPlayer();
@@ -96,7 +96,6 @@ private:
     QList< Chessman> nowChessman;               //当前的棋子
     QString iniChessmanStr;                     //初始界面对应字符串
     QLabel *label[MAXM+5] ;                     //图像标签
-    QPoint nowChoose;                           //我方当前选中的棋子
     QList<QPoint> myNextCandidate;              //我方当前选中的棋子接下来可以走的位置
     LocalPlayer *localPlayer[2];                //两名本地玩家
     Player *player[2] ;                         //两名玩家

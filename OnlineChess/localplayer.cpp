@@ -13,4 +13,9 @@ LocalPlayer::~LocalPlayer()
 void LocalPlayer::play(){
     mainWindow->setStatus(MainWindow::STATUSMYTURN) ;
     mainWindow->nowColor = color ;
+    mainWindow->checkGameStatus() ;
+}
+
+void LocalPlayer::gameEnd(int status){
+    ;
 }

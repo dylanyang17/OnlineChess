@@ -8,6 +8,7 @@ class Player
 public:
     Player(MainWindow *mainWindow, int _color=0);
     virtual void play();
+    virtual void gameEnd(int status);
     virtual ~Player();
     void setColor(int color) ;
     int getColor();

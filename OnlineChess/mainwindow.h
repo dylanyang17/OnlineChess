@@ -39,7 +39,7 @@ public:
     const static int TYPENUM=6 ;
     const static int COLORNUM=2 ;
     const static int MAXM=32; //最大棋子数
-    const static int STATUSNOTRUN=0, STATUSWIN=1, STATUSLOSE=2, STATUSTIE=3, STATUSMYTURN=4, STATUSOPPTURN=5 ;
+    const static int STATUSNOTRUN=0, STATUSWHITEWIN=1, STATUSBLACKWIN=2, STATUSTIE=3, STATUSMYTURN=4, STATUSOPPTURN=5 ;
     const static int TYPEKING=1, TYPEQUEEN=2, TYPEBISHOP=3, TYPEKNIGHT=4, TYPEROOK=5, TYPEPAWN=6;
     const static int PAWNINI=1, PAWNNORMAL=2, PAWNUPGRADE=3;
     const static int CHECKNEITHER=0, CHECKWHITE=1, CHECKBLACK=2, CHECKBOTH=3;
@@ -74,6 +74,10 @@ public:
     int getPawnStatus(Chessman man);
     int isCheck();
     QList<QPoint> getCandidatePosWithCheck(Chessman man);
+    int isStuck();
+    int isCheckMate();
+    void checkGameStatus();
+    int isStaleMate();
 private slots:
     void on_actionLoadInit_triggered();
 

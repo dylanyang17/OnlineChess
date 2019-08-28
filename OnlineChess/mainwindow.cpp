@@ -248,10 +248,17 @@ void MainWindow::setStatus(int status){
         ui->actionPVP->setEnabled(true);
         ui->actionOnline->setEnabled(true);
     }
+    if(status==STATUSWHITEWIN){
+        QMessageBox::information(this, "游戏结束", "白方胜利!") ;
+    } else if(status==STATUSBLACKWIN){
+        QMessageBox::information(this, "游戏结束", "黑方胜利!") ;
+    } else if(status==STATUSTIE){
+        QMessageBox::information(this, "游戏结束", "平局!") ;
+    }
 }
 
 int MainWindow::isCheck(){
-    //判断哪个颜色被将军，0为没有被将军，1为白色被将军，2为黑色被将军，3为同时被将军
+    //判断哪个颜色被将军，0为没有被将军，1为白色被将军，2为黑色被将军，3为同时被将军，用常变量表示
     int ret=0;
     QPoint kingPos[2];
     for(int i=0;i<nowChessman.length();++i){
@@ -267,6 +274,29 @@ int MainWindow::isCheck(){
         }
     }
     return ret;
+}
+
+int MainWindow::isStuck(){
+    //判断哪个颜色无法走子，0为没有，1为白色，2为黑色，3为两者用和isCheck一样的常变量进行表示
+    int ret=3 ;
+    for(int i=0;i<nowChessman.length();++i){
+        Chessman man = nowChessman.at(i) ;
+        QList<QPoint> list = getCandidatePosWithCheck(man) ;
+        if(list.length()>0) {
+            ret &= (man.color ? (~CHECKBLACK) : (~CHECKWHITE)) ;
+        }
+    }
+    return ret;
+}
+
+int MainWindow::isCheckMate(){
+    //判断哪个颜色被将杀，0为没有被将杀，1为白色被将杀，2为黑色被将杀，用和isCheck一样的常变量表示
+    return (isCheck()&isStuck()) ;    //正被将军且无法移动的一方被将杀
+}
+
+int MainWindow::isStaleMate(){
+    //判断哪个颜色被逼和，0为没有被逼和，1为白色被逼和，2为黑色被逼和，用和isCheck一样的常变量表示
+    return ((~isCheck())&isStuck()) ; //未被将军且无法移动的一方被逼和
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -346,6 +376,17 @@ void MainWindow::debug(QString s){
 bool MainWindow::isRunning()
 {
     return nowStatus==STATUSMYTURN || nowStatus==STATUSOPPTURN ;
+}
+
+void MainWindow::checkGameStatus(){
+    //接下来是本地玩家着子，判断是否已经输了或者逼和
+    if(isCheckMate() & (nowColor ? MainWindow::CHECKBLACK : MainWindow::CHECKWHITE)){
+        setStatus(nowColor ? MainWindow::STATUSWHITEWIN : MainWindow::STATUSBLACKWIN) ;
+        for(int i=0;i<=1;++i) player[i]->gameEnd(nowStatus) ;
+    } else if(isStaleMate() & (nowColor ? MainWindow::CHECKBLACK : MainWindow::CHECKWHITE)){
+        setStatus(STATUSTIE) ;
+        for(int i=0;i<=1;++i) player[i]->gameEnd(nowStatus) ;
+    }
 }
 
 QPoint MainWindow::getPoint(int x, int y){

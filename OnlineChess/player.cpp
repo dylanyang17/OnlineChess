@@ -11,6 +11,11 @@ void Player::play()
 
 }
 
+void Player::gameEnd(int status)
+{
+
+}
+
 Player::~Player()
 {
 

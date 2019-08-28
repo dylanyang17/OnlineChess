@@ -7,6 +7,7 @@ class LocalPlayer : public Player
 public:
     LocalPlayer(MainWindow *mainWindow, int _color);
     void play();
+    void gameEnd(int status);
     ~LocalPlayer();
 };
 

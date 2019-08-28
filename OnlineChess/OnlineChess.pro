@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,17 +25,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        dialogconnecttohost.cpp \
+        dialogcreatehost.cpp \
         localplayer.cpp \
         main.cpp \
         mainwindow.cpp \
-        player.cpp
+        player.cpp \
+        remoteplayer.cpp
 
 HEADERS += \
+        dialogconnecttohost.h \
+        dialogcreatehost.h \
         localplayer.h \
         mainwindow.h \
-        player.h
+        player.h \
+        remoteplayer.h
 
 FORMS += \
+        dialogconnecttohost.ui \
+        dialogcreatehost.ui \
         mainwindow.ui
 
 # Default rules for deployment.

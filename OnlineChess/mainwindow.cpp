@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "player.h"
 #include "localplayer.h"
+#include "remoteplayer.h"
 #include <QPainter>
 #include <QFile>
 #include <QDebug>
@@ -15,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    debugOn=true;
     timeLim=timeRes=30; //30秒时间限制
     gridSize=53;
     tagSize=gridSize/8 ;
@@ -28,6 +28,15 @@ MainWindow::MainWindow(QWidget *parent) :
     circleColor = QColor(99,181,176);
     castlingColor = QColor(219,54,62) ;
     iniChessmanStr = QString("white\nking 1 e1\nqueen 1 d1\nbishop 2 c1 f1\nknight 2 b1 g1\nrook 2 a1 h1\npawn 8 a2 b2 c2 d2 e2 f2 g2 h2\nblack\nking 1 e8\nqueen 1 d8\nbishop 2 c8 f8\nknight 2 b8 g8\nrook 2 a8 h8\npawn 8 a7 b7 c7 d7 e7 f7 g7 h7") ;
+
+    textBrowser = new QTextBrowser(this) ;
+    textBrowser->setGeometry(QRect(getPoint(9,9)+QPoint(30,0),getPoint(9,1)+QPoint(300,0))) ;
+    textBrowser->hide();
+    ui->actionDebug->setChecked(true) ;
+    on_actionDebug_triggered();
+    MESSAGELOSE = "LOSE" ;
+    MESSAGETIE = "TIE" ;
+    isPlayingOnline=false;
     on_actionLoadInit_triggered();
     upgradingInd=-1;
     for(int i=0;i<MAXM;++i) label[i] = new QLabel(this) ;
@@ -39,9 +48,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lcdNumber->display(timeRes) ;
     playTimer = new QTimer(this) ;
     connect(playTimer , SIGNAL(timeout()), this, SLOT(passOneSec())) ;
-    setStatus(STATUSNOTRUN) ;
     localPlayer[0] = new LocalPlayer(this, 0) ;
     localPlayer[1] = new LocalPlayer(this, 1) ;
+    remotePlayer = new RemotePlayer(this, 0);
+    setStatus(STATUSNOTRUN) ;
 
     //king
     dir[0][1].append(QPoint(-1,0)) ;
@@ -126,8 +136,13 @@ void MainWindow::paintEvent(QPaintEvent *event){
         painter.drawText(tmp.x()+3, tmp.y()+tagSize+6, QString::number(j)) ;
     }
     QPoint tmp = getPoint(col+1,1);
-    this->setMinimumSize(tmp.x()+50, tmp.y()+50);
-    this->setMaximumSize(tmp.x()+50, tmp.y()+50);
+    if(!debugOn){
+        this->setMinimumSize(tmp.x()+50, tmp.y()+50);
+        this->setMaximumSize(tmp.x()+50, tmp.y()+50);
+    } else{
+        this->setMinimumSize(tmp.x()+350, tmp.y()+50);
+        this->setMaximumSize(tmp.x()+350, tmp.y()+50);
+    }
 
     //棋子图片
     //debug(QString("nowChessman.length(): %1").arg(nowChessman.length())) ;
@@ -280,7 +295,6 @@ QList<QPoint> MainWindow::getCandidatePosWithCheck(Chessman man){
     }
 
     //王车易位
-    //TODO
     if(man.type==TYPEKING){
         int y = (man.color ? 8 : 1);
         if(man.pos == QPoint(5,y) && !(isCheck() & (man.color ? CHECKBLACK : CHECKWHITE))){
@@ -362,13 +376,17 @@ void MainWindow::setStatus(int status){
         ui->actionLoadInit->setEnabled(false);
         ui->actionLoadFromFile->setEnabled(false);
         ui->actionPVP->setEnabled(false);
-        ui->actionOnline->setEnabled(false);
+        ui->actionConnectHost->setEnabled(false);
+        ui->actionCreateHost->setEnabled(false);
         playTimer->start(1000) ;
     } else{
         ui->actionLoadInit->setEnabled(true);
         ui->actionLoadFromFile->setEnabled(true);
         ui->actionPVP->setEnabled(true);
-        ui->actionOnline->setEnabled(true);
+        ui->actionConnectHost->setEnabled(true);
+        ui->actionCreateHost->setEnabled(true);
+        if(isPlayingOnline) tcpSocket->close() ;
+        isPlayingOnline=false ;
     }
     if(status==STATUSMYTURN){
         ui->actionGiveIn->setEnabled(true);
@@ -445,6 +463,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
                 upgradingInd = -1;
                 update();
                 nextPlayer();
+                sendMessage(getChessStr()) ;
             }
             return ;
         }
@@ -493,6 +512,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
                             nextPlayer() ;
                             nowChoose = QPoint(-1,-1) ;
+                            sendMessage(getChessStr()) ;
                             break;
                         }
                     }
@@ -530,8 +550,10 @@ int MainWindow::getChessmanIndOnPos(QPoint pos){
 }
 
 void MainWindow::debug(QString s){
-    if(debugOn)
+    if(debugOn){
         qDebug() << s ;
+        textBrowser->append(s) ;
+    }
 }
 
 bool MainWindow::isRunning()
@@ -670,6 +692,10 @@ void MainWindow::loadChessStr(QString chessStr){
     }
     nowChessman = list ;
     nowColor = color^1 ;
+    nowPlayerInd = color^1;
+    if(isRunning() && isPlayingOnline){
+        setStatus((nowColor==remotePlayer->getColor())? STATUSOPPTURN : STATUSMYTURN) ;
+    }
     update() ;
 }
 
@@ -681,6 +707,44 @@ int MainWindow::getGroundType(int x, int y){
 void MainWindow::nextPlayer(){
     nowPlayerInd^=1;
     player[nowPlayerInd]->play();
+}
+
+void MainWindow::handleRead(){
+    if(nowStatus==STATUSOPPTURN){
+        QString s = tcpSocket->readAll();
+        if(s==MESSAGELOSE){
+            setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
+            return;
+        } else if(s==MESSAGETIE){
+            setStatus(STATUSTIE) ;
+            return;
+        }
+        loadChessStr(s) ;
+        nextPlayer();
+    }
+}
+
+void MainWindow::sendMessage(QString s){
+    QByteArray *array =new QByteArray;
+    array->clear();
+    array->append(s);
+    tcpSocket->write(array->data());
+}
+
+void MainWindow::startOnlineGame(QTcpSocket *tcpSocket, int color){
+    this->tcpSocket = tcpSocket ;
+    connect(this->tcpSocket, SIGNAL(readyRead()), this, SLOT(handleRead()));
+    isPlayingOnline=true;
+    player[color] = localPlayer[color] ;
+    remotePlayer->setColor(color^1) ;
+    player[color^1] = remotePlayer ;
+    if(!color){
+        sendMessage(getChessStr()) ;
+        player[nowPlayerInd]->play();
+    } else{
+        nowPlayerInd=0 ;
+        player[nowPlayerInd]->play();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -738,4 +802,27 @@ void MainWindow::on_actionGiveIn_triggered()
 {
     setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
     for(int i=0;i<=1;++i) player[i]->gameEnd(nowStatus) ;
+}
+
+void MainWindow::on_actionCreateHost_triggered()
+{
+    DialogCreateHost *dialogCreateHost = new DialogCreateHost(this, this) ;
+    dialogCreateHost -> show();
+}
+
+void MainWindow::on_actionConnectHost_triggered()
+{
+    DialogConnectToHost *dialogConnectToHost = new DialogConnectToHost(this, this) ;
+    dialogConnectToHost->show() ;
+}
+
+void MainWindow::on_actionDebug_triggered()
+{
+    debugOn = ui->actionDebug->isChecked() ;
+    if(debugOn){
+        textBrowser->show();
+    } else{
+        textBrowser->hide();
+    }
+    update();
 }

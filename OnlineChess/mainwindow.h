@@ -6,6 +6,10 @@
 #include <QList>
 #include <QTimer>
 #include <QLabel>
+#include <QtNetwork>
+#include <QTextBrowser>
+#include "dialogcreatehost.h"
+#include "dialogconnecttohost.h"
 
 namespace Ui {
 class MainWindow;
@@ -13,6 +17,7 @@ class MainWindow;
 
 class Player;
 class LocalPlayer;
+class RemotePlayer;
 
 struct  Chessman{
     //type: 1 king ; 2 queen ; 3 bishop ; 4 knight ; 5 rook ; 6 pawn
@@ -44,6 +49,7 @@ public:
     const static int TYPEKING=1, TYPEQUEEN=2, TYPEBISHOP=3, TYPEKNIGHT=4, TYPEROOK=5, TYPEPAWN=6;
     const static int PAWNINI=1, PAWNNORMAL=2, PAWNUPGRADE=3;
     const static int CHECKNEITHER=0, CHECKWHITE=1, CHECKBLACK=2, CHECKBOTH=3;
+    QString MESSAGELOSE, MESSAGETIE;
     QList<QPoint> dir[COLORNUM][TYPENUM+1] ;  //存储每个颜色和种类的棋子可以朝哪些方向走 TODO  注意兵需要特殊处理
     bool canWalkMore[TYPENUM+1] ;             //记录每个种类的棋子能否沿dir走多步 TODO
     void paintEvent(QPaintEvent *event);
@@ -69,6 +75,7 @@ public:
 
     int nowColor ;                              //当前走子方的颜色
     QPoint nowChoose;                           //我方当前选中的棋子
+    QTcpSocket *tcpSocket;
 
     void setStatus(int status);
     void nextPlayer();
@@ -79,8 +86,11 @@ public:
     int isCheckMate();
     void checkGameStatus();
     int isStaleMate();
+    void startOnlineGame(QTcpSocket *tcpSocket, int color);
+    void sendMessage(QString s);
 public slots:
     void passOneSec();
+    void handleRead();
 private slots:
     void on_actionLoadInit_triggered();
 
@@ -91,6 +101,12 @@ private slots:
     void on_actionPVP_triggered();
 
     void on_actionGiveIn_triggered();
+
+    void on_actionCreateHost_triggered();
+
+    void on_actionConnectHost_triggered();
+
+    void on_actionDebug_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -111,7 +127,9 @@ private:
     int nowPlayerInd;                           //现在正在下棋的玩家索引
     int timeLim, timeRes;                       //时间限制和剩余
     int upgradingInd;                           //正在进行兵升变的棋子索引
-   // OnlinePlayer *onlinePlayer;               //在线玩家
+    RemotePlayer *remotePlayer;                 //远程玩家
+    bool isPlayingOnline;                       //当前是否在线游戏
+    QTextBrowser *textBrowser;                  //用于调试
 };
 
 #endif // MAINWINDOW_H

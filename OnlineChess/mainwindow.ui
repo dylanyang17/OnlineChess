@@ -31,15 +31,22 @@
      <x>0</x>
      <y>0</y>
      <width>865</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>游戏</string>
     </property>
+    <widget class="QMenu" name="menu_5">
+     <property name="title">
+      <string>联机对弈</string>
+     </property>
+     <addaction name="actionCreateHost"/>
+     <addaction name="actionConnectHost"/>
+    </widget>
     <addaction name="actionPVP"/>
-    <addaction name="actionOnline"/>
+    <addaction name="menu_5"/>
     <addaction name="separator"/>
     <addaction name="actionGiveIn"/>
    </widget>
@@ -57,8 +64,15 @@
     <addaction name="menu_4"/>
     <addaction name="actionSaveChess"/>
    </widget>
+   <widget class="QMenu" name="menu_6">
+    <property name="title">
+     <string>选项</string>
+    </property>
+    <addaction name="actionDebug"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menu_3"/>
+   <addaction name="menu_6"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -72,11 +86,6 @@
   <action name="actionPVP">
    <property name="text">
     <string>双人对弈</string>
-   </property>
-  </action>
-  <action name="actionOnline">
-   <property name="text">
-    <string>联机对弈</string>
    </property>
   </action>
   <action name="actionLoadInit">
@@ -97,6 +106,27 @@
   <action name="actionGiveIn">
    <property name="text">
     <string>认输</string>
+   </property>
+  </action>
+  <action name="actionCreateHost">
+   <property name="text">
+    <string>创建主机</string>
+   </property>
+  </action>
+  <action name="actionConnectHost">
+   <property name="text">
+    <string>连接主机</string>
+   </property>
+  </action>
+  <action name="actionDebug">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>开启调试</string>
    </property>
   </action>
  </widget>

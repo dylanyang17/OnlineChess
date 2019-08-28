@@ -236,6 +236,7 @@ Makefile: ../OnlineChess/OnlineChess.pro C:/Applications/QT/Qt5.12.4/5.12.4/ming
 		../OnlineChess/OnlineChess.pro \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/Qt5Widgets.prl \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/Qt5Gui.prl \
+		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/Qt5Network.prl \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/Qt5Core.prl \
 		C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/qtmain.prl
 	$(QMAKE) -o Makefile ..\OnlineChess\OnlineChess.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
@@ -412,6 +413,7 @@ C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/mkspecs/features/lex.prf:
 ../OnlineChess/OnlineChess.pro:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/Qt5Widgets.prl:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/Qt5Gui.prl:
+C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/Qt5Network.prl:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/Qt5Core.prl:
 C:/Applications/QT/Qt5.12.4/5.12.4/mingw73_64/lib/qtmain.prl:
 qmake: FORCE

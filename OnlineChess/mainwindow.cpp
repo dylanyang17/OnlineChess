@@ -236,7 +236,7 @@ QList<QPoint> MainWindow::getCandidatePos(Chessman man){
             if(tmpInd!=-1) break ; //被遮挡
         }
     }
-    if(type==TYPEPAWN){
+    if(type==TYPEPAWN){ //特殊处理pawn
         QPoint d = dir[color][type].at(0) , newPos = pos+2*d;
         if(getPawnStatus(man)==PAWNINI && getChessmanIndOnPos(pos+d)==-1 && getChessmanIndOnPos(newPos)==-1 && !outGridRange(newPos)){
             list.append(newPos);
@@ -252,7 +252,6 @@ QList<QPoint> MainWindow::getCandidatePos(Chessman man){
         }
     }
 
-    //注意特殊处理pawn TODO
     return list;
 }
 
@@ -273,6 +272,10 @@ QList<QPoint> MainWindow::getCandidatePosWithCheck(Chessman man){
             ++ it ;
         }
     }
+
+    //王车易位
+    //TODO
+
     return list;
 }
 

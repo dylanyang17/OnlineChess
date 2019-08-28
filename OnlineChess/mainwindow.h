@@ -18,8 +18,12 @@ struct  Chessman{
     //color: 0 white ; 1 black
     int type, color;
     QPoint pos;
-     Chessman(int _type=0, int _color=0, QPoint _pos=QPoint(0,0)){
+    Chessman(int _type=0, int _color=0, QPoint _pos=QPoint(0,0)){
         type = _type; color = _color ; pos = _pos;
+    }
+
+    bool operator== (const Chessman &a) const{
+        return a.type==type && a.color==color && a.pos==pos;
     }
 };
 
@@ -37,6 +41,8 @@ public:
     const static int MAXM=32; //最大棋子数
     const static int STATUSNOTRUN=0, STATUSWIN=1, STATUSLOSE=2, STATUSTIE=3, STATUSMYTURN=4, STATUSOPPTURN=5 ;
     const static int TYPEKING=1, TYPEQUEEN=2, TYPEBISHOP=3, TYPEKNIGHT=4, TYPEROOK=5, TYPEPAWN=6;
+    const static int PAWNINI=1, PAWNNORMAL=2, PAWNUPGRADE=3;
+    const static int CHECKNEITHER=0, CHECKWHITE=1, CHECKBLACK=2, CHECKBOTH=3;
     QList<QPoint> dir[COLORNUM][TYPENUM+1] ;  //存储每个颜色和种类的棋子可以朝哪些方向走 TODO  注意兵需要特殊处理
     bool canWalkMore[TYPENUM+1] ;             //记录每个种类的棋子能否沿dir走多步 TODO
     void paintEvent(QPaintEvent *event);
@@ -65,6 +71,9 @@ public:
 
     void setStatus(int status);
     void nextPlayer();
+    int getPawnStatus(Chessman man);
+    int isCheck();
+    QList<QPoint> getCandidatePosWithCheck(Chessman man);
 private slots:
     void on_actionLoadInit_triggered();
 

@@ -166,8 +166,17 @@ bool MainWindow::outGridRange(QPoint pos){
     return pos.x()<1||pos.y()<1||pos.x()>col||pos.y()>row;
 }
 
+int MainWindow::getPawnStatus(Chessman man){
+    //分为在起始位置、普通位置以及升变位置三种情况
+    int y = man.pos.y();
+    if(man.color==1) y=col+1-y; //统一黑白
+    if(y==2) return PAWNINI ;
+    else if(y==8) return PAWNUPGRADE;
+    else return PAWNNORMAL;
+}
+
 QList<QPoint> MainWindow::getCandidatePos(Chessman man){
-    //计算棋子下一步能走的所有位置
+    //计算棋子下一步能走的所有位置，注意这里是不考虑将军的情况下合法能走到的位置
     QList<QPoint> list;
     int type = man.type, color = man.color;
     QPoint pos = man.pos ;
@@ -188,12 +197,41 @@ QList<QPoint> MainWindow::getCandidatePos(Chessman man){
     }
     if(type==TYPEPAWN){
         QPoint d = dir[color][type].at(0) , newPos = pos+2*d;
-        if(getChessmanIndOnPos(pos+d)==-1 && getChessmanIndOnPos(newPos)==-1 && !outGridRange(newPos)){
+        if(getPawnStatus(man)==PAWNINI && getChessmanIndOnPos(pos+d)==-1 && getChessmanIndOnPos(newPos)==-1 && !outGridRange(newPos)){
+            list.append(newPos);
+        }
+        //吃子
+        newPos = pos+d+QPoint(1,0);
+        if(getChessmanIndOnPos(newPos)!=-1 && nowChessman.at(getChessmanIndOnPos(newPos)).color!=color){
+            list.append(newPos);
+        }
+        newPos = pos+d+QPoint(-1,0);
+        if(getChessmanIndOnPos(newPos)!=-1 && nowChessman.at(getChessmanIndOnPos(newPos)).color!=color){
             list.append(newPos);
         }
     }
 
     //注意特殊处理pawn TODO
+    return list;
+}
+
+QList<QPoint> MainWindow::getCandidatePosWithCheck(Chessman man){
+    //计算棋子下一步能走的所有位置，考虑不能被将军
+    QList<QPoint> list = getCandidatePos(man) ;
+    int ind = nowChessman.indexOf(man) ;
+    QList<QPoint>::iterator it = list.begin();
+    while(it!=list.end()){
+        QPoint newPos = *it;
+        QList<Chessman> tmpNowChessman = nowChessman; //备份nowChessman
+        myMove(ind, newPos) ;
+        int ck = isCheck() ;
+        nowChessman = tmpNowChessman ;
+        if(ck & (man.color ? CHECKBLACK : CHECKWHITE)){
+            it = list.erase(it) ;
+        } else {
+            ++ it ;
+        }
+    }
     return list;
 }
 
@@ -210,6 +248,25 @@ void MainWindow::setStatus(int status){
         ui->actionPVP->setEnabled(true);
         ui->actionOnline->setEnabled(true);
     }
+}
+
+int MainWindow::isCheck(){
+    //判断哪个颜色被将军，0为没有被将军，1为白色被将军，2为黑色被将军，3为同时被将军
+    int ret=0;
+    QPoint kingPos[2];
+    for(int i=0;i<nowChessman.length();++i){
+        Chessman man = nowChessman.at(i) ;
+        if(man.type==TYPEKING) kingPos[man.color]=man.pos;
+    }
+    for(int i=0;i<nowChessman.length();++i){
+        //枚举走哪个棋子
+        Chessman man = nowChessman.at(i) ;
+        QList<QPoint> list = getCandidatePos(man) ;
+        if(list.indexOf(kingPos[man.color^1])!=-1){
+            ret |= (man.color ? CHECKWHITE : CHECKBLACK) ;
+        }
+    }
+    return ret;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -238,12 +295,13 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
                     bool suc=false ;
                     for(int i=0;i<myNextCandidate.length();++i){
                         if(myNextCandidate.at(i) == QPoint(x,y)){
-                            debug("test1");
+                            //debug("test1");
                             myMove(getChessmanIndOnPos(nowChoose), QPoint(x,y)) ;
-                            debug("test2");
+                            //debug("test2");
                             suc=true;
                             nextPlayer() ;
-                            debug("test3");
+                            //debug("test3");
+                            nowChoose = QPoint(-1,-1) ;
                             break;
                         }
                     }
@@ -257,12 +315,14 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
             if(nowChoose != QPoint(-1,-1)){
                 int ind = getChessmanIndOnPos(nowChoose) ;
-                myNextCandidate = getCandidatePos(nowChessman.at(ind));
+                myNextCandidate = getCandidatePosWithCheck(nowChessman.at(ind));
             } else{
                 myNextCandidate.clear();
             }
         }
+        //debug("test4");
         update();
+        //debug("test5");
     }
 }
 

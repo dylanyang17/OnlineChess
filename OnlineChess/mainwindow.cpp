@@ -15,11 +15,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     debugOn=true;
+    timeLim=timeRes=30; //30秒时间限制
     gridSize=53;
     tagSize=gridSize/8 ;
     circleR=gridSize/3;
     col=row=8;
-    leftUp = QPoint(50,50) ;
+    leftUp = QPoint(50,100) ;
     groundColor[0] = QColor(240,218,181) ;
     groundColor[1] = QColor(181,135,99) ;
     circleColor = QColor(99,181,176);
@@ -28,11 +29,14 @@ MainWindow::MainWindow(QWidget *parent) :
     for(int i=0;i<MAXM;++i){
         label[i] = new QLabel(this) ;
     }
-    setStatus(STATUSNOTRUN) ;
     nowChoose = QPoint(-1,-1);
     memset(canWalkMore,0,sizeof(canWalkMore)) ;
     canWalkMore[2]=canWalkMore[3]=canWalkMore[5]=true;
-
+    ui->lcdNumber->setDigitCount(2);
+    ui->lcdNumber->display(timeRes) ;
+    playTimer = new QTimer(this) ;
+    connect(playTimer , SIGNAL(timeout()), this, SLOT(passOneSec())) ;
+    setStatus(STATUSNOTRUN) ;
     localPlayer[0] = new LocalPlayer(this, 0) ;
     localPlayer[1] = new LocalPlayer(this, 1) ;
 
@@ -235,18 +239,39 @@ QList<QPoint> MainWindow::getCandidatePosWithCheck(Chessman man){
     return list;
 }
 
+void MainWindow::passOneSec(){
+    if(timeRes>0){
+        if(--timeRes == 0 && nowStatus==STATUSMYTURN){
+            on_actionGiveIn_triggered();
+        }
+        ui->lcdNumber->display(timeRes) ;
+    }
+}
+
 void MainWindow::setStatus(int status){
+    //棋盘状态改变
     nowStatus = status;
+    nowChoose = QPoint(-1,-1);
+    myNextCandidate.clear();
+    timeRes = timeLim ;
+    ui->lcdNumber->display(timeRes) ;
+    playTimer->stop() ;
     if(isRunning()){
         ui->actionLoadInit->setEnabled(false);
         ui->actionLoadFromFile->setEnabled(false);
         ui->actionPVP->setEnabled(false);
         ui->actionOnline->setEnabled(false);
+        playTimer->start(1000) ;
     } else{
         ui->actionLoadInit->setEnabled(true);
         ui->actionLoadFromFile->setEnabled(true);
         ui->actionPVP->setEnabled(true);
         ui->actionOnline->setEnabled(true);
+    }
+    if(status==STATUSMYTURN){
+        ui->actionGiveIn->setEnabled(true);
+    } else{
+        ui->actionGiveIn->setEnabled(false);
     }
     if(status==STATUSWHITEWIN){
         QMessageBox::information(this, "游戏结束", "白方胜利!") ;
@@ -255,6 +280,7 @@ void MainWindow::setStatus(int status){
     } else if(status==STATUSTIE){
         QMessageBox::information(this, "游戏结束", "平局!") ;
     }
+    update() ;
 }
 
 int MainWindow::isCheck(){
@@ -479,12 +505,12 @@ QString MainWindow::getChessStr(){
         tmpList[man.color][man.type].append(man) ;
     }
     for(int i=1;i<=TYPENUM;++i){
-        QString tmp = chessman2str(tmpList[0][i]) ;
+        QString tmp = chessman2str(tmpList[nowColor][i]) ;
         if(tmp!="") ret = ret + tmp + "\n" ;
     }
     ret = ret + (nowColor ? "white\n" : "black\n") ;
     for(int i=1;i<=TYPENUM;++i){
-        QString tmp = chessman2str(tmpList[1][i]) ;
+        QString tmp = chessman2str(tmpList[nowColor^1][i]) ;
         if(tmp!="") ret = ret + tmp + "\n" ;
     }
     return ret;
@@ -571,4 +597,10 @@ void MainWindow::on_actionPVP_triggered()
         std::swap(player[0],player[1]);
     }
     player[0]->play();
+}
+
+void MainWindow::on_actionGiveIn_triggered()
+{
+    setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
+    for(int i=0;i<=1;++i) player[i]->gameEnd(nowStatus) ;
 }

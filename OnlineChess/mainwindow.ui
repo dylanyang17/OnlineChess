@@ -13,7 +13,18 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QLCDNumber" name="lcdNumber">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>10</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -27,20 +38,27 @@
     <property name="title">
      <string>游戏</string>
     </property>
-    <widget class="QMenu" name="menu_2">
+    <addaction name="actionPVP"/>
+    <addaction name="actionOnline"/>
+    <addaction name="separator"/>
+    <addaction name="actionGiveIn"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>局面</string>
+    </property>
+    <widget class="QMenu" name="menu_4">
      <property name="title">
       <string>载入局面</string>
      </property>
      <addaction name="actionLoadInit"/>
      <addaction name="actionLoadFromFile"/>
     </widget>
-    <addaction name="menu_2"/>
+    <addaction name="menu_4"/>
     <addaction name="actionSaveChess"/>
-    <addaction name="separator"/>
-    <addaction name="actionPVP"/>
-    <addaction name="actionOnline"/>
    </widget>
    <addaction name="menu"/>
+   <addaction name="menu_3"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -51,6 +69,16 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionPVP">
+   <property name="text">
+    <string>双人对弈</string>
+   </property>
+  </action>
+  <action name="actionOnline">
+   <property name="text">
+    <string>联机对弈</string>
+   </property>
+  </action>
   <action name="actionLoadInit">
    <property name="text">
     <string>初始局面</string>
@@ -66,14 +94,9 @@
     <string>保存局面</string>
    </property>
   </action>
-  <action name="actionPVP">
+  <action name="actionGiveIn">
    <property name="text">
-    <string>双人对弈</string>
-   </property>
-  </action>
-  <action name="actionOnline">
-   <property name="text">
-    <string>联机对弈</string>
+    <string>认输</string>
    </property>
   </action>
  </widget>

@@ -1,0 +1,13 @@
+black
+king 1 d1
+queen 1 c8
+bishop 2 c1 f1
+knight 2 b1 e4
+rook 2 a1 h1
+pawn 8 a2 b2 d6 c6 e2 h6 g2 f4
+white
+king 1 e8
+bishop 1 f8
+knight 1 g8
+rook 2 a7 h8
+pawn 2 a6 e3

@@ -1,0 +1,9 @@
+white
+king 1 d1
+queen 1 c5
+bishop 2 c1 f1
+knight 2 b1 g5
+rook 2 b2 h1
+pawn 8 a3 a5 d6 c7 e2 h6 g2 f4
+black
+king 1 a8

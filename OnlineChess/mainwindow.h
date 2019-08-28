@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPoint>
 #include <QList>
+#include <QTimer>
 #include <QLabel>
 
 namespace Ui {
@@ -78,6 +79,8 @@ public:
     int isCheckMate();
     void checkGameStatus();
     int isStaleMate();
+public slots:
+    void passOneSec();
 private slots:
     void on_actionLoadInit_triggered();
 
@@ -86,6 +89,8 @@ private slots:
     void on_actionSaveChess_triggered();
 
     void on_actionPVP_triggered();
+
+    void on_actionGiveIn_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -99,8 +104,10 @@ private:
     QList<QPoint> myNextCandidate;              //我方当前选中的棋子接下来可以走的位置
     LocalPlayer *localPlayer[2];                //两名本地玩家
     Player *player[2] ;                         //两名玩家
+    QTimer *playTimer ;                         //着子的计时器
     int nowPlayerInd;                           //现在正在下棋的玩家索引
-   // OnlinePlayer *onlinePlayer;                 //在线玩家
+    int timeLim, timeRes;                       //时间限制和剩余
+   // OnlinePlayer *onlinePlayer;               //在线玩家
 };
 
 #endif // MAINWINDOW_H

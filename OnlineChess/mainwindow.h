@@ -99,6 +99,7 @@ private:
     QPoint leftUp;                              //棋盘左上角
     QColor groundColor[2];                      //两种格子颜色
     QColor circleColor;                         //圆环的颜色
+    QColor castlingColor;                       //王车易位的圆环颜色
     QList< Chessman> nowChessman;               //当前的棋子
     QString iniChessmanStr;                     //初始界面对应字符串
     QLabel *label[MAXM+5] ;                     //图像标签

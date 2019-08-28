@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     groundColor[0] = QColor(240,218,181) ;
     groundColor[1] = QColor(181,135,99) ;
     circleColor = QColor(99,181,176);
+    castlingColor = QColor(219,54,62) ;
     iniChessmanStr = QString("white\nking 1 e1\nqueen 1 d1\nbishop 2 c1 f1\nknight 2 b1 g1\nrook 2 a1 h1\npawn 8 a2 b2 c2 d2 e2 f2 g2 h2\nblack\nking 1 e8\nqueen 1 d8\nbishop 2 c8 f8\nknight 2 b8 g8\nrook 2 a8 h8\npawn 8 a7 b7 c7 d7 e7 f7 g7 h7") ;
     on_actionLoadInit_triggered();
     upgradingInd=-1;
@@ -148,7 +149,12 @@ void MainWindow::paintEvent(QPaintEvent *event){
     for(int i=0;i<myNextCandidate.length();++i){
         QPoint p=myNextCandidate.at(i) ;
         QPen pen = painter.pen();
-        pen.setColor(circleColor);
+        if(nowChessman.at(getChessmanIndOnPos(nowChoose)).type==TYPEKING
+                && std::abs(nowChoose.x()-p.x())>=2){
+            //王车易位
+            pen.setColor(castlingColor) ;
+        }
+        else pen.setColor(circleColor);
         pen.setWidth(circleR/5) ;
         painter.setPen(pen) ;
         int margin=(gridSize-2*circleR)/2;
@@ -157,9 +163,9 @@ void MainWindow::paintEvent(QPaintEvent *event){
 
     //升变
     if(upgradingInd!=-1){
-        for(int i=0;i<nowChessman.size();++i){
+        for(int i=0;i<nowChessman.length();++i){
             QPoint pos = nowChessman.at(i).pos ;
-            if(pos.x()>=3 && pos.x()<=6 && pos.y()>=3 && pos.y()<=4)
+            if(pos.x()>=3 && pos.x()<=6 && pos.y()>=4 && pos.y()<=5)
                 label[i]->hide();
         }
         int color = nowChessman.at(upgradingInd).color;
@@ -275,6 +281,61 @@ QList<QPoint> MainWindow::getCandidatePosWithCheck(Chessman man){
 
     //王车易位
     //TODO
+    if(man.type==TYPEKING){
+        int y = (man.color ? 8 : 1);
+        if(man.pos == QPoint(5,y) && !(isCheck() & (man.color ? CHECKBLACK : CHECKWHITE))){
+            bool canLongCastling=false, canShortCastling=false;
+            Chessman rook1, rook2 ;
+            for(int i=0;i<nowChessman.length();++i){
+                Chessman rook = nowChessman.at(i);
+                if(rook.color==man.color && rook.type==TYPEROOK){
+                    if(rook.pos == QPoint(1,y)){
+                        canLongCastling=true;
+                        rook1 = rook;
+                    }
+                    else if(rook.pos == QPoint(8,y)){
+                        canShortCastling=true;
+                        rook2 = rook;
+                    }
+                }
+            }
+            if(getChessmanIndOnPos(QPoint(4,y))!=-1 || getChessmanIndOnPos(QPoint(3,y))!=-1) canLongCastling=false;
+            if(getChessmanIndOnPos(QPoint(6,y))!=-1 || getChessmanIndOnPos(QPoint(7,y))!=-1) canShortCastling=false;
+            if(canLongCastling){
+                QList<Chessman> tmpNowChessman = nowChessman ;
+                moveChessman(ind, QPoint(4,y)) ;
+                if(isCheck() & (man.color ? CHECKBLACK : CHECKWHITE)){
+                    canLongCastling=false;
+                }
+                moveChessman(ind, QPoint(3,y)) ;
+                moveChessman(nowChessman.indexOf(rook1), QPoint(4,y)) ;
+                if(isCheck() & (man.color ? CHECKBLACK : CHECKWHITE)){
+                    canLongCastling=false;
+                }
+                nowChessman = tmpNowChessman ;
+                if(canLongCastling){
+                    list.append(QPoint(3,y));
+                }
+            }
+
+            if(canShortCastling){
+                QList<Chessman> tmpNowChessman = nowChessman ;
+                moveChessman(ind, QPoint(6,y)) ;
+                if(isCheck() & (man.color ? CHECKBLACK : CHECKWHITE)){
+                    canShortCastling=false;
+                }
+                moveChessman(ind, QPoint(7,y)) ;
+                moveChessman(nowChessman.indexOf(rook2), QPoint(6,y)) ;
+                if(isCheck() & (man.color ? CHECKBLACK : CHECKWHITE)){
+                    canShortCastling=false;
+                }
+                nowChessman = tmpNowChessman ;
+                if(canShortCastling){
+                    list.append(QPoint(7,y));
+                }
+            }
+        }
+    }
 
     return list;
 }
@@ -412,17 +473,26 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
                             suc=true;
                             int ind = getChessmanIndOnPos(nowChoose);
                             moveChessman(ind, QPoint(x,y)) ; //可能导致吃子进而索引改变
-                            nowChoose = QPoint(-1,-1) ;
 
                             //处理兵升变
                             ind = getChessmanIndOnPos(QPoint(x,y));
                             Chessman man = nowChessman.at(ind) ;
                             if(man.type==TYPEPAWN && getPawnStatus(man)==PAWNUPGRADE){
                                 upgradingInd = ind ;
+                                nowChoose = QPoint(-1,-1) ;
                                 break ;
                             }
 
+                            //处理王车易位
+                            if(man.type==TYPEKING && std::abs(man.pos.x()-nowChoose.x())==2){
+                                int y = (man.color ? 8 : 1) ;
+                                int x = ((man.pos.x()<nowChoose.x()) ? 1 : 8) ;
+                                int rookInd = nowChessman.indexOf(Chessman(TYPEROOK,man.color,QPoint(x,y))) ;
+                                moveChessman(rookInd, QPoint(((x==1) ? 4 : 6), y)) ;
+                            }
+
                             nextPlayer() ;
+                            nowChoose = QPoint(-1,-1) ;
                             break;
                         }
                     }

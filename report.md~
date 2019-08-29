@@ -49,4 +49,4 @@ CHESSPACK YYR
 
 在Communication类中实现了类似QTcpSocket的消息接收机制，只不过这里是以一个完整的包内容作为单位的。
 
-实现的函数有：bool hasNextPack();  QString nextPack()，还定义了信号readyRead();
+实现的函数有：bool hasNextPack();  QString nextPack() ; void close(); 还定义了信号readyReadPack();

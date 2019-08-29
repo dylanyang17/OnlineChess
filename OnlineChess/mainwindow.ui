@@ -95,6 +95,7 @@
      <string>选项</string>
     </property>
     <addaction name="actionDebug"/>
+    <addaction name="actionPauseTimer"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_3"/>
@@ -153,6 +154,14 @@
    </property>
    <property name="text">
     <string>开启调试</string>
+   </property>
+  </action>
+  <action name="actionPauseTimer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>计时暂停</string>
    </property>
   </action>
  </widget>

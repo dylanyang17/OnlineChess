@@ -90,6 +90,7 @@ public:
     void startOnlineGame(QTcpSocket *tcpSocket, int color);
     void sendMessage(QString s);
 
+    void closeEvent(QCloseEvent *event);
 public slots:
     void passOneSec();
     void handleReadPack();
@@ -110,6 +111,8 @@ private slots:
     void on_actionConnectHost_triggered();
 
     void on_actionDebug_triggered();
+
+    void on_actionPauseTimer_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -132,6 +135,7 @@ private:
     RemotePlayer *remotePlayer;                 //远程玩家
     bool isPlayingOnline;                       //当前是否在线游戏
     QTextBrowser *textBrowser;                  //用于调试
+    int timeout;                                //对方超时时间
 };
 
 #endif // MAINWINDOW_H

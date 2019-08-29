@@ -34,6 +34,7 @@ public:
     QAction *actionCreateHost;
     QAction *actionConnectHost;
     QAction *actionDebug;
+    QAction *actionPauseTimer;
     QWidget *centralWidget;
     QLCDNumber *lcdNumber;
     QLabel *labelNowColor;
@@ -70,6 +71,9 @@ public:
         actionDebug->setObjectName(QString::fromUtf8("actionDebug"));
         actionDebug->setCheckable(true);
         actionDebug->setChecked(false);
+        actionPauseTimer = new QAction(MainWindow);
+        actionPauseTimer->setObjectName(QString::fromUtf8("actionPauseTimer"));
+        actionPauseTimer->setCheckable(true);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         lcdNumber = new QLCDNumber(centralWidget);
@@ -117,6 +121,7 @@ public:
         menu_4->addAction(actionLoadInit);
         menu_4->addAction(actionLoadFromFile);
         menu_6->addAction(actionDebug);
+        menu_6->addAction(actionPauseTimer);
 
         retranslateUi(MainWindow);
 
@@ -134,6 +139,7 @@ public:
         actionCreateHost->setText(QApplication::translate("MainWindow", "\345\210\233\345\273\272\344\270\273\346\234\272", nullptr));
         actionConnectHost->setText(QApplication::translate("MainWindow", "\350\277\236\346\216\245\344\270\273\346\234\272", nullptr));
         actionDebug->setText(QApplication::translate("MainWindow", "\345\274\200\345\220\257\350\260\203\350\257\225", nullptr));
+        actionPauseTimer->setText(QApplication::translate("MainWindow", "\350\256\241\346\227\266\346\232\202\345\201\234", nullptr));
         labelNowColor->setText(QApplication::translate("MainWindow", "\346\211\247\345\255\220\346\226\271\357\274\232", nullptr));
         labelMyColor->setText(QApplication::translate("MainWindow", "\346\210\221\346\226\271\357\274\232", nullptr));
         menu->setTitle(QApplication::translate("MainWindow", "\346\270\270\346\210\217", nullptr));

@@ -356,11 +356,18 @@ QList<QPoint> MainWindow::getCandidatePosWithCheck(Chessman man){
 }
 
 void MainWindow::passOneSec(){
-    if(timeRes>0){
-        if(--timeRes == 0 && nowStatus==STATUSMYTURN){
-            on_actionGiveIn_triggered();
+    if(!ui->actionPauseTimer->isChecked()){
+        if(timeRes>0){
+            if(--timeRes == 0 && nowStatus==STATUSMYTURN){
+                on_actionGiveIn_triggered();
+            }
+            ui->lcdNumber->display(timeRes) ;
+            timeout=0;
+        } else{
+            if(++timeout==3){
+                setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
+            }
         }
-        ui->lcdNumber->display(timeRes) ;
     }
 }
 
@@ -374,8 +381,10 @@ void MainWindow::setStatus(int status){
     playTimer->stop() ;
     upgradingInd = -1;
     if(isRunning()){
-        ui->actionLoadInit->setEnabled(false);
-        ui->actionLoadFromFile->setEnabled(false);
+        if(ui->actionDebug->isChecked()==false || nowColor == remotePlayer->getColor()){
+            ui->actionLoadInit->setEnabled(false);
+            ui->actionLoadFromFile->setEnabled(false);
+        }
         ui->actionPVP->setEnabled(false);
         ui->actionConnectHost->setEnabled(false);
         ui->actionCreateHost->setEnabled(false);
@@ -388,6 +397,7 @@ void MainWindow::setStatus(int status){
         ui->actionPVP->setEnabled(true);
         ui->actionConnectHost->setEnabled(true);
         ui->actionCreateHost->setEnabled(true);
+        for(int i=0;i<=1;++i) player[i]->gameEnd(status) ;
         if(isPlayingOnline) communication->close() ;
         isPlayingOnline=false ;
     }
@@ -570,10 +580,8 @@ void MainWindow::checkGameStatus(){
     //接下来是本地玩家着子，判断是否已经输了或者逼和
     if(isCheckMate() & (nowColor ? MainWindow::CHECKBLACK : MainWindow::CHECKWHITE)){
         setStatus(nowColor ? MainWindow::STATUSWHITEWIN : MainWindow::STATUSBLACKWIN) ;
-        for(int i=0;i<=1;++i) player[i]->gameEnd(nowStatus) ;
     } else if(isStaleMate() & (nowColor ? MainWindow::CHECKBLACK : MainWindow::CHECKWHITE)){
         setStatus(STATUSTIE) ;
-        for(int i=0;i<=1;++i) player[i]->gameEnd(nowStatus) ;
     }
 }
 
@@ -719,19 +727,23 @@ void MainWindow::sendMessage(QString s){
 
 void MainWindow::handleReadPack(){
     debug("READ PACK!") ;
-    if(nowStatus==STATUSOPPTURN){
-        while(communication->hasNextPack()){
-            QString s = communication->nextPack();
-            debug("GETPACK! Length:" + QString::number(s.length())) ;
-            if(s==MESSAGELOSE){
-                setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
-                return;
-            } else if(s==MESSAGETIE){
-                setStatus(STATUSTIE) ;
-                return;
-            }
+
+    while(communication->hasNextPack()){
+        QString s = communication->nextPack();
+        debug("GETPACK! Length:" + QString::number(s.length())) ;
+        if(s==MESSAGELOSE){
+            setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
+        } else if(s==MESSAGETIE){
+            setStatus(STATUSTIE) ;
+        } else if(nowStatus==STATUSOPPTURN){
             loadChessStr(s) ;
         }
+    }
+}
+
+void MainWindow::closeEvent(QCloseEvent *event){
+    if(isPlayingOnline){
+        on_actionGiveIn_triggered();
     }
 }
 
@@ -759,6 +771,9 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionLoadInit_triggered()
 {
     loadChessStr(iniChessmanStr) ;
+    if(isPlayingOnline){
+        sendMessage(iniChessmanStr);
+    }
     update();
 }
 
@@ -772,7 +787,11 @@ void MainWindow::on_actionLoadFromFile_triggered()
         return ;
     }
     QTextStream in(&file);
-    loadChessStr(in.readAll());
+    QString s = in.readAll();
+    loadChessStr(s);
+    if(isPlayingOnline){
+        sendMessage(s);
+    }
     file.close();
 }
 
@@ -805,7 +824,6 @@ void MainWindow::on_actionPVP_triggered()
 void MainWindow::on_actionGiveIn_triggered()
 {
     setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
-    for(int i=0;i<=1;++i) player[i]->gameEnd(nowStatus) ;
 }
 
 void MainWindow::on_actionCreateHost_triggered()
@@ -829,4 +847,9 @@ void MainWindow::on_actionDebug_triggered()
         textBrowser->hide();
     }
     update();
+}
+
+void MainWindow::on_actionPauseTimer_triggered()
+{
+
 }

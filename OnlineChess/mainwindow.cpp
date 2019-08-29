@@ -35,7 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     textBrowser->hide();
     ui->actionDebug->setChecked(true) ;
     on_actionDebug_triggered();
-    MESSAGELOSE = "LOSE" ;
+    MESSAGEWHITEWIN = "WHITE WIN" ;
+    MESSAGEBLACKWIN = "BLACK WIN" ;
     MESSAGETIE = "TIE" ;
     isPlayingOnline=false;
     on_actionLoadInit_triggered();
@@ -381,9 +382,15 @@ void MainWindow::setStatus(int status){
     playTimer->stop() ;
     upgradingInd = -1;
     if(isRunning()){
-        if(ui->actionDebug->isChecked()==false || nowColor == remotePlayer->getColor()){
+        if(ui->actionDebug->isChecked()==false){
             ui->actionLoadInit->setEnabled(false);
             ui->actionLoadFromFile->setEnabled(false);
+        } else if(nowColor == remotePlayer->getColor()){
+            ui->actionLoadInit->setEnabled(false);
+            ui->actionLoadFromFile->setEnabled(false);
+        } else{
+            ui->actionLoadInit->setEnabled(true);
+            ui->actionLoadFromFile->setEnabled(true);
         }
         ui->actionPVP->setEnabled(false);
         ui->actionConnectHost->setEnabled(false);
@@ -397,7 +404,7 @@ void MainWindow::setStatus(int status){
         ui->actionPVP->setEnabled(true);
         ui->actionConnectHost->setEnabled(true);
         ui->actionCreateHost->setEnabled(true);
-        for(int i=0;i<=1;++i) player[i]->gameEnd(status) ;
+        if(status!=STATUSNOTRUN) for(int i=0;i<=1;++i) player[i]->gameEnd(status) ;
         if(isPlayingOnline) communication->close() ;
         isPlayingOnline=false ;
     }
@@ -731,8 +738,10 @@ void MainWindow::handleReadPack(){
     while(communication->hasNextPack()){
         QString s = communication->nextPack();
         debug("GETPACK! Length:" + QString::number(s.length())) ;
-        if(s==MESSAGELOSE){
-            setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
+        if(s==MESSAGEWHITEWIN){
+            setStatus(STATUSWHITEWIN) ;
+        } else if(s==MESSAGEBLACKWIN){
+            setStatus(STATUSBLACKWIN) ;
         } else if(s==MESSAGETIE){
             setStatus(STATUSTIE) ;
         } else if(nowStatus==STATUSOPPTURN){
@@ -744,6 +753,7 @@ void MainWindow::handleReadPack(){
 void MainWindow::closeEvent(QCloseEvent *event){
     if(isPlayingOnline){
         on_actionGiveIn_triggered();
+        event->accept();
     }
 }
 
@@ -823,7 +833,12 @@ void MainWindow::on_actionPVP_triggered()
 
 void MainWindow::on_actionGiveIn_triggered()
 {
-    setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
+    if(isPlayingOnline){
+        int myColor = 0;
+        if(myColor == remotePlayer->getColor()) myColor^=1;
+        setStatus(myColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
+    }
+    else setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
 }
 
 void MainWindow::on_actionCreateHost_triggered()

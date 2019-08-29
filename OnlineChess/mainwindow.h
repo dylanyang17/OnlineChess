@@ -50,7 +50,7 @@ public:
     const static int TYPEKING=1, TYPEQUEEN=2, TYPEBISHOP=3, TYPEKNIGHT=4, TYPEROOK=5, TYPEPAWN=6;
     const static int PAWNINI=1, PAWNNORMAL=2, PAWNUPGRADE=3;
     const static int CHECKNEITHER=0, CHECKWHITE=1, CHECKBLACK=2, CHECKBOTH=3;
-    QString MESSAGELOSE, MESSAGETIE;
+    QString MESSAGETIE, MESSAGEWHITEWIN, MESSAGEBLACKWIN;
     QList<QPoint> dir[COLORNUM][TYPENUM+1] ;  //存储每个颜色和种类的棋子可以朝哪些方向走 注意兵需要特殊处理
     bool canWalkMore[TYPENUM+1] ;             //记录每个种类的棋子能否沿dir走多步
     void paintEvent(QPaintEvent *event);

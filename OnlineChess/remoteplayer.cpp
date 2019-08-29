@@ -17,7 +17,9 @@ void RemotePlayer::gameEnd(int status)
 {
     if(status==MainWindow::STATUSTIE){
         mainWindow->sendMessage(mainWindow->MESSAGETIE) ;
-    } else{
-        mainWindow->sendMessage(mainWindow->MESSAGELOSE) ;
+    } else if(status==MainWindow::STATUSWHITEWIN){
+        mainWindow->sendMessage(mainWindow->MESSAGEWHITEWIN) ;
+    } else if(status==MainWindow::STATUSBLACKWIN){
+        mainWindow->sendMessage(mainWindow->MESSAGEBLACKWIN) ;
     }
 }

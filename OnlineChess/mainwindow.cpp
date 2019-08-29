@@ -736,7 +736,7 @@ void MainWindow::handleReadPack(){
 }
 
 void MainWindow::startOnlineGame(QTcpSocket *tcpSocket, int color){
-    communication = new Communication(this, tcpSocket) ;
+    communication = new Communication(this, tcpSocket, this) ;
     connect(communication, SIGNAL(readyReadPack()), this, SLOT(handleReadPack()));
     isPlayingOnline=true;
     player[color] = localPlayer[color] ;

@@ -51,10 +51,10 @@ QString Communication::nextPack()
 }
 
 void Communication::handleRead(){
+    mainWindow->debug("READ MESSAGE");
     readBuffer += tcpSocket->readAll() ;
     int pos;
     QString tmp;
-    mainWindow->debug("READ MESSAGE");
     if((tmp=unpack(readBuffer, pos))!=""){
         mainWindow->debug("THE MESSAGE IS A PACK");
         readBuffer.remove(0, pos) ;

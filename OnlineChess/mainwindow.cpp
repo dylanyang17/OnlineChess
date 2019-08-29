@@ -3,6 +3,7 @@
 #include "player.h"
 #include "localplayer.h"
 #include "remoteplayer.h"
+#include "communication.h"
 #include <QPainter>
 #include <QFile>
 #include <QDebug>
@@ -387,7 +388,7 @@ void MainWindow::setStatus(int status){
         ui->actionPVP->setEnabled(true);
         ui->actionConnectHost->setEnabled(true);
         ui->actionCreateHost->setEnabled(true);
-        if(isPlayingOnline) tcpSocket->close() ;
+        if(isPlayingOnline) communication->close() ;
         isPlayingOnline=false ;
     }
     if(status==STATUSMYTURN){
@@ -554,7 +555,9 @@ int MainWindow::getChessmanIndOnPos(QPoint pos){
 void MainWindow::debug(QString s){
     if(debugOn){
         qDebug() << s ;
-        textBrowser->append(s) ;
+        QStringList list = s.split('\n') ;
+        for(int i=0;i<list.length();++i)
+            textBrowser->append(list.at(i)) ;
     }
 }
 
@@ -709,30 +712,32 @@ void MainWindow::nextPlayer(){
     player[nowColor^1]->play();
 }
 
-void MainWindow::handleRead(){
+void MainWindow::sendMessage(QString s){
+    debug("SEND PACK!") ;
+    communication -> sendMessage(s);
+}
+
+void MainWindow::handleReadPack(){
+    debug("READ PACK!") ;
     if(nowStatus==STATUSOPPTURN){
-        QString s = tcpSocket->readAll();
-        if(s==MESSAGELOSE){
-            setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
-            return;
-        } else if(s==MESSAGETIE){
-            setStatus(STATUSTIE) ;
-            return;
+        while(communication->hasNextPack()){
+            QString s = communication->nextPack();
+            debug("GETPACK! Length:" + QString::number(s.length())) ;
+            if(s==MESSAGELOSE){
+                setStatus(nowColor ? STATUSWHITEWIN : STATUSBLACKWIN) ;
+                return;
+            } else if(s==MESSAGETIE){
+                setStatus(STATUSTIE) ;
+                return;
+            }
+            loadChessStr(s) ;
         }
-        loadChessStr(s) ;
     }
 }
 
-void MainWindow::sendMessage(QString s){
-    QByteArray *array =new QByteArray;
-    array->clear();
-    array->append(s);
-    tcpSocket->write(array->data());
-}
-
 void MainWindow::startOnlineGame(QTcpSocket *tcpSocket, int color){
-    this->tcpSocket = tcpSocket ;
-    connect(this->tcpSocket, SIGNAL(readyRead()), this, SLOT(handleRead()));
+    communication = new Communication(this, tcpSocket) ;
+    connect(communication, SIGNAL(readyReadPack()), this, SLOT(handleReadPack()));
     isPlayingOnline=true;
     player[color] = localPlayer[color] ;
     remotePlayer->setColor(color^1) ;

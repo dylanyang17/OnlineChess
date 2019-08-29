@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        communication.cpp \
         dialogconnecttohost.cpp \
         dialogcreatehost.cpp \
         localplayer.cpp \
@@ -34,6 +35,7 @@ SOURCES += \
         remoteplayer.cpp
 
 HEADERS += \
+        communication.h \
         dialogconnecttohost.h \
         dialogcreatehost.h \
         localplayer.h \

@@ -18,6 +18,7 @@ class MainWindow;
 class Player;
 class LocalPlayer;
 class RemotePlayer;
+class Communication;
 
 struct  Chessman{
     //type: 1 king ; 2 queen ; 3 bishop ; 4 knight ; 5 rook ; 6 pawn
@@ -50,8 +51,8 @@ public:
     const static int PAWNINI=1, PAWNNORMAL=2, PAWNUPGRADE=3;
     const static int CHECKNEITHER=0, CHECKWHITE=1, CHECKBLACK=2, CHECKBOTH=3;
     QString MESSAGELOSE, MESSAGETIE;
-    QList<QPoint> dir[COLORNUM][TYPENUM+1] ;  //存储每个颜色和种类的棋子可以朝哪些方向走 TODO  注意兵需要特殊处理
-    bool canWalkMore[TYPENUM+1] ;             //记录每个种类的棋子能否沿dir走多步 TODO
+    QList<QPoint> dir[COLORNUM][TYPENUM+1] ;  //存储每个颜色和种类的棋子可以朝哪些方向走 注意兵需要特殊处理
+    bool canWalkMore[TYPENUM+1] ;             //记录每个种类的棋子能否沿dir走多步
     void paintEvent(QPaintEvent *event);
     QPoint getPoint(int x, int y);
     int char2ind(QChar s);
@@ -72,10 +73,10 @@ public:
     void moveChessman(int ind, QPoint p);
     QList<QPoint> getCandidatePos(Chessman man);
     bool outGridRange(QPoint pos);
+    Communication *communication;
 
     int nowColor ;                              //当前走子方的颜色
     QPoint nowChoose;                           //我方当前选中的棋子
-    QTcpSocket *tcpSocket;
 
     void setStatus(int status);
     void nextPlayer();
@@ -88,9 +89,11 @@ public:
     int isStaleMate();
     void startOnlineGame(QTcpSocket *tcpSocket, int color);
     void sendMessage(QString s);
+
 public slots:
     void passOneSec();
-    void handleRead();
+    void handleReadPack();
+
 private slots:
     void on_actionLoadInit_triggered();
 

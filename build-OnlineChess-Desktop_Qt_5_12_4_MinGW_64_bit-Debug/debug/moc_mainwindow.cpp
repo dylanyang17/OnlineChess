@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[12];
-    char stringdata0[258];
+    char stringdata0[262];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -34,18 +34,18 @@ static const qt_meta_stringdata_MainWindow_t qt_meta_stringdata_MainWindow = {
 QT_MOC_LITERAL(0, 0, 10), // "MainWindow"
 QT_MOC_LITERAL(1, 11, 10), // "passOneSec"
 QT_MOC_LITERAL(2, 22, 0), // ""
-QT_MOC_LITERAL(3, 23, 10), // "handleRead"
-QT_MOC_LITERAL(4, 34, 27), // "on_actionLoadInit_triggered"
-QT_MOC_LITERAL(5, 62, 31), // "on_actionLoadFromFile_triggered"
-QT_MOC_LITERAL(6, 94, 28), // "on_actionSaveChess_triggered"
-QT_MOC_LITERAL(7, 123, 22), // "on_actionPVP_triggered"
-QT_MOC_LITERAL(8, 146, 25), // "on_actionGiveIn_triggered"
-QT_MOC_LITERAL(9, 172, 29), // "on_actionCreateHost_triggered"
-QT_MOC_LITERAL(10, 202, 30), // "on_actionConnectHost_triggered"
-QT_MOC_LITERAL(11, 233, 24) // "on_actionDebug_triggered"
+QT_MOC_LITERAL(3, 23, 14), // "handleReadPack"
+QT_MOC_LITERAL(4, 38, 27), // "on_actionLoadInit_triggered"
+QT_MOC_LITERAL(5, 66, 31), // "on_actionLoadFromFile_triggered"
+QT_MOC_LITERAL(6, 98, 28), // "on_actionSaveChess_triggered"
+QT_MOC_LITERAL(7, 127, 22), // "on_actionPVP_triggered"
+QT_MOC_LITERAL(8, 150, 25), // "on_actionGiveIn_triggered"
+QT_MOC_LITERAL(9, 176, 29), // "on_actionCreateHost_triggered"
+QT_MOC_LITERAL(10, 206, 30), // "on_actionConnectHost_triggered"
+QT_MOC_LITERAL(11, 237, 24) // "on_actionDebug_triggered"
 
     },
-    "MainWindow\0passOneSec\0\0handleRead\0"
+    "MainWindow\0passOneSec\0\0handleReadPack\0"
     "on_actionLoadInit_triggered\0"
     "on_actionLoadFromFile_triggered\0"
     "on_actionSaveChess_triggered\0"
@@ -103,7 +103,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->passOneSec(); break;
-        case 1: _t->handleRead(); break;
+        case 1: _t->handleReadPack(); break;
         case 2: _t->on_actionLoadInit_triggered(); break;
         case 3: _t->on_actionLoadFromFile_triggered(); break;
         case 4: _t->on_actionSaveChess_triggered(); break;

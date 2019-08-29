@@ -1,0 +1,13 @@
+release/communication.o
+release/dialogconnecttohost.o
+release/dialogcreatehost.o
+release/localplayer.o
+release/main.o
+release/mainwindow.o
+release/player.o
+release/remoteplayer.o
+release/qrc_res.o
+release/moc_communication.o
+release/moc_dialogconnecttohost.o
+release/moc_dialogcreatehost.o
+release/moc_mainwindow.o

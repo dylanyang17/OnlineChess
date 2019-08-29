@@ -1,0 +1,13 @@
+debug/communication.o
+debug/dialogconnecttohost.o
+debug/dialogcreatehost.o
+debug/localplayer.o
+debug/main.o
+debug/mainwindow.o
+debug/player.o
+debug/remoteplayer.o
+debug/qrc_res.o
+debug/moc_communication.o
+debug/moc_dialogconnecttohost.o
+debug/moc_dialogcreatehost.o
+debug/moc_mainwindow.o

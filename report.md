@@ -14,7 +14,7 @@ QT Creator 4.9.1(Enterprise)，QT 5.12.4 (MinGW 7.3.0 64-bit)。
 
 ### 界面
 
-////TODO
+![主界面](F:\QT Projects\OnlineChess\res\主界面.png)
 
 ### 位置的表示
 
@@ -117,7 +117,7 @@ void Communication::handleRead(){
 
 创建主机界面如下：
 
-////TODO
+![创建主机](F:\QT Projects\OnlineChess\res\创建主机.png)
 
 默认输入127.0.0.1，可以进行更改，点击“创建主机”即可开始等待连接。
 
@@ -142,7 +142,7 @@ this->close();
 
 连接主机界面如下：
 
-/////TODO
+![连接主机](F:\QT Projects\OnlineChess\res\连接主机.png)
 
 在输入IP地址之后点击“连接主机”即开始尝试连接，连接成功之前点击“取消连接”即可停止连接。
 
@@ -229,7 +229,7 @@ void MainWindow::startOnlineGame(QTcpSocket *tcpSocket, int color){
 
 定义Player作为基类，再定义LocalPlayer和RemotePlayer类，结构如下：
 
-////TODO
+![Player类结构](F:\QT Projects\OnlineChess\res\Player类结构.png)
 
 ### 基类
 
@@ -280,4 +280,70 @@ void RemotePlayer::gameEnd(int status)
 
 即游戏结束时需要告知远程玩家。
 
-## 游戏规则
+## 规则实现
+
+首先使用 QList\<Chessman\> nowChessman 记录了当前场上的棋子有哪些。
+
+### 普通移动规则
+
+规则在MainWindow类中实现，通过QList\<QPoint\> dir[i][j]记录了颜色为i，种类为j的棋子能够移动的方向，canWalkMore[j]记录了这个棋子能否沿这些方向移动多步。
+
+在MainWindow类的构造函数中初始化dir和canWalkMore：
+
+```C++
+memset(canWalkMore,0,sizeof(canWalkMore)) ;
+    canWalkMore[2]=canWalkMore[3]=canWalkMore[5]=true;
+
+    //king
+    dir[0][1].append(QPoint(-1,0)) ;
+    dir[0][1].append(QPoint(1,0)) ;
+    dir[0][1].append(QPoint(0,-1)) ;
+    dir[0][1].append(QPoint(0,1)) ;
+    dir[0][1].append(QPoint(-1,-1)) ;
+    dir[0][1].append(QPoint(1,1)) ;
+    dir[0][1].append(QPoint(-1,1)) ;
+    dir[0][1].append(QPoint(1,-1)) ;
+
+    //queen
+    dir[0][2] = dir[0][1] ;
+
+    //bishop
+    dir[0][3].append(QPoint(-1,-1)) ;
+    dir[0][3].append(QPoint(1,1)) ;
+    dir[0][3].append(QPoint(-1,1)) ;
+    dir[0][3].append(QPoint(1,-1)) ;
+
+    //knight
+    dir[0][4].append(QPoint(-2,1));
+    dir[0][4].append(QPoint(2,-1));
+    dir[0][4].append(QPoint(-1,2));
+    dir[0][4].append(QPoint(1,-2));
+    dir[0][4].append(QPoint(2,1));
+    dir[0][4].append(QPoint(-2,-1));
+    dir[0][4].append(QPoint(1,2));
+    dir[0][4].append(QPoint(-1,-2));
+
+    //rook
+    dir[0][5].append(QPoint(-1,0)) ;
+    dir[0][5].append(QPoint(1,0)) ;
+    dir[0][5].append(QPoint(0,-1)) ;
+    dir[0][5].append(QPoint(0,1)) ;
+
+    //pawn
+    dir[0][6].append(QPoint(0,1)) ;
+
+    //黑方的棋子能走的dir (实际上只有pawn同白方有区别)
+    for(int j=1;j<=TYPENUM;++j){
+        for(int k=0;k<dir[0][j].length();++k){
+            QPoint p = dir[0][j].at(k) ;
+            p.setY(-p.y());
+            dir[1][j].append(p) ;
+        }
+    }
+```
+
+这样一来，在之后枚举移动规则时便会非常方便。
+
+### 选中和移动
+
+当轮到自己的回合时，鼠标点击一个棋子便会将其能走的位置用圈标记出来，注意一般来说棋子不能跨越其它棋子移动。这一部分在mousePressEvent中实现。

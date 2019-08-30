@@ -44,8 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
     for(int i=0;i<MAXM;++i) label[i] = new QLabel(this) ;
     for(int i=0;i<4;++i) upgradeLabel[i] = new QLabel(this);
     nowChoose = QPoint(-1,-1);
-    memset(canWalkMore,0,sizeof(canWalkMore)) ;
-    canWalkMore[2]=canWalkMore[3]=canWalkMore[5]=true;
     ui->lcdNumber->setDigitCount(2);
     ui->lcdNumber->display(timeRes) ;
     playTimer = new QTimer(this) ;
@@ -54,6 +52,9 @@ MainWindow::MainWindow(QWidget *parent) :
     localPlayer[1] = new LocalPlayer(this, 1) ;
     remotePlayer = new RemotePlayer(this, 0);
     setStatus(STATUSNOTRUN) ;
+
+    memset(canWalkMore,0,sizeof(canWalkMore)) ;
+    canWalkMore[2]=canWalkMore[3]=canWalkMore[5]=true;
 
     //king
     dir[0][1].append(QPoint(-1,0)) ;
@@ -374,6 +375,7 @@ void MainWindow::passOneSec(){
 
 void MainWindow::setStatus(int status){
     //棋盘状态改变
+    //debug("TTT,status:"+QString::number(status)) ;
     nowStatus = status;
     nowChoose = QPoint(-1,-1);
     myNextCandidate.clear();
@@ -385,7 +387,7 @@ void MainWindow::setStatus(int status){
         if(ui->actionDebug->isChecked()==false){
             ui->actionLoadInit->setEnabled(false);
             ui->actionLoadFromFile->setEnabled(false);
-        } else if(nowColor == remotePlayer->getColor()){
+        } else if(isPlayingOnline && nowColor == remotePlayer->getColor()){
             ui->actionLoadInit->setEnabled(false);
             ui->actionLoadFromFile->setEnabled(false);
         } else{
@@ -728,8 +730,10 @@ void MainWindow::nextPlayer(){
 }
 
 void MainWindow::sendMessage(QString s){
-    debug("SEND PACK!") ;
-    communication -> sendMessage(s);
+    if(isPlayingOnline){
+        debug("SEND PACK!") ;
+        communication -> sendMessage(s);
+    }
 }
 
 void MainWindow::handleReadPack(){

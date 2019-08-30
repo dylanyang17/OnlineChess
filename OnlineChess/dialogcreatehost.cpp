@@ -51,10 +51,10 @@ void DialogCreateHost::on_pushButtonStart_clicked()
             return;
         }
         tcpServer->listen(addr, PORT) ;
-        ui->pushButtonStart->setText("停止连接") ;
+        ui->pushButtonStart->setText("停止") ;
     } else{
         tcpServer->close();
-        ui->pushButtonStart->setText("创建主机") ;
+        ui->pushButtonStart->setText("创建") ;
     }
 
 }

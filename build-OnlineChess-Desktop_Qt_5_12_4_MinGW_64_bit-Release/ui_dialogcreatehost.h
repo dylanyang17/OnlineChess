@@ -87,9 +87,9 @@ public:
 
     void retranslateUi(QDialog *DialogCreateHost)
     {
-        DialogCreateHost->setWindowTitle(QApplication::translate("DialogCreateHost", "Dialog", nullptr));
+        DialogCreateHost->setWindowTitle(QApplication::translate("DialogCreateHost", "\345\210\233\345\273\272\344\270\273\346\234\272", nullptr));
         label->setText(QApplication::translate("DialogCreateHost", "Host IP:", nullptr));
-        pushButtonStart->setText(QApplication::translate("DialogCreateHost", "\345\210\233\345\273\272\344\270\273\346\234\272", nullptr));
+        pushButtonStart->setText(QApplication::translate("DialogCreateHost", "\345\210\233\345\273\272", nullptr));
         pushButtonClose->setText(QApplication::translate("DialogCreateHost", "\345\205\263\351\227\255", nullptr));
     } // retranslateUi
 

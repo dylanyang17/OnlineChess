@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>创建主机</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -65,7 +65,7 @@
      <item>
       <widget class="QPushButton" name="pushButtonStart">
        <property name="text">
-        <string>创建主机</string>
+        <string>创建</string>
        </property>
       </widget>
      </item>

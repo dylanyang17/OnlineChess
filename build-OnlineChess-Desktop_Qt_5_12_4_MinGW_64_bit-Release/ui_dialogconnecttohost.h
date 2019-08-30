@@ -87,7 +87,7 @@ public:
 
     void retranslateUi(QDialog *DialogConnectToHost)
     {
-        DialogConnectToHost->setWindowTitle(QApplication::translate("DialogConnectToHost", "Dialog", nullptr));
+        DialogConnectToHost->setWindowTitle(QApplication::translate("DialogConnectToHost", "\350\277\236\346\216\245\344\270\273\346\234\272", nullptr));
         label->setText(QApplication::translate("DialogConnectToHost", "Host IP:", nullptr));
         pushButtonConnect->setText(QApplication::translate("DialogConnectToHost", "\350\277\236\346\216\245", nullptr));
         pushButtonCancel->setText(QApplication::translate("DialogConnectToHost", "\345\217\226\346\266\210", nullptr));

@@ -88,7 +88,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 865, 26));
+        menuBar->setGeometry(QRect(0, 0, 865, 23));
         menu = new QMenu(menuBar);
         menu->setObjectName(QString::fromUtf8("menu"));
         menu_5 = new QMenu(menu);
@@ -130,7 +130,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "\347\275\221\347\273\234\345\233\275\351\231\205\350\261\241\346\243\213", nullptr));
         actionPVP->setText(QApplication::translate("MainWindow", "\345\217\214\344\272\272\345\257\271\345\274\210", nullptr));
         actionLoadInit->setText(QApplication::translate("MainWindow", "\345\210\235\345\247\213\345\261\200\351\235\242", nullptr));
         actionLoadFromFile->setText(QApplication::translate("MainWindow", "\344\273\216\346\226\207\344\273\266\350\275\275\345\205\245..", nullptr));

@@ -185,6 +185,97 @@ void DialogConnectToHost::handleConnected()
 }
 ```
 
+#### IP检查
+
+IP检查使用正则表达式进行，这部分代码如下：
+
+```C++
+bool DialogCreateHost::checkIP(QString s)
+{
+    QRegExp regExp("(((\\d{1,2})|(1\\d{2})|(2[0-4]\\d)|(25[0-5])).){3}((\\d{1,2})|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))");
+    return regExp.indexIn(s)!=-1 && regExp.matchedLength()==s.length();
+}
+```
+
 ### 传输内容
 
-首先每次传输时直接按照读取残局的格式进行传输，这样会很方便，并且对于残局读取和普通移动以及兵升变等可以一并处理。
+**在两端连接上之后，便会在MainWindow类对象中使用communication成员变量进行相互通信。**
+
+连接成功时代码如下：
+
+```C++
+void MainWindow::startOnlineGame(QTcpSocket *tcpSocket, int color){
+    communication = new Communication(this, tcpSocket, this) ;
+    connect(communication, SIGNAL(readyReadPack()), this, SLOT(handleReadPack()));
+    isPlayingOnline=true;
+    player[color] = localPlayer[color] ;
+    remotePlayer->setColor(color^1) ;
+    player[color^1] = remotePlayer ;
+    if(!color){
+        sendMessage(getChessStr()) ;
+        player[nowColor]->play();
+    } else{
+        nowColor=0 ;
+        player[nowColor]->play();
+    }
+}
+```
+
+每次传输时直接按照读取残局的格式进行传输，这样会很方便，并且对于残局读取和普通移动以及兵升变等可以一并处理。
+
+另外定义了字符串QString MESSAGEWHITEWIN, MESSAGEBLACKWIN, MESSAGETIE，传输这些特定字符串时表示游戏结束。
+
+## 玩家类
+
+定义Player作为基类，再定义LocalPlayer和RemotePlayer类，结构如下：
+
+////TODO
+
+### 基类
+
+在Player类中，定义了受保护的成员变量颜色color，响应的函数getColor()、setColor(int)，以及虚函数play()和gameEnd(int)，play()表示轮到该玩家下子了，gameEnd(int)表示通知玩家游戏已经结束。另外还定义了MainWindow \*mainWindow便于回调。
+
+### LocalPlayer类
+
+这个类定义的play()函数和gameEnd(int)函数如下：
+
+```C++
+void LocalPlayer::play(){
+    mainWindow->nowChoose = QPoint(-1,-1) ;
+    mainWindow->nowColor = color ;
+    mainWindow->setStatus(MainWindow::STATUSMYTURN) ;
+    mainWindow->checkGameStatus() ;
+}
+
+void LocalPlayer::gameEnd(int status){
+    ;
+}
+```
+
+因为是本地玩家，而游戏结束的弹窗是在setStatus函数中进行的，所以在gameEnd函数中并不需要特别做什么事情。
+
+### RemotePlayer类
+
+这个类定义的play()函数和gameEnd(int)函数如下：
+
+```C++
+void RemotePlayer::play()
+{
+    mainWindow->nowChoose = QPoint(-1,-1) ;
+    mainWindow->nowColor = color ;
+    mainWindow->setStatus(MainWindow::STATUSOPPTURN) ;
+}
+
+void RemotePlayer::gameEnd(int status)
+{
+    if(status==MainWindow::STATUSTIE){
+        mainWindow->sendMessage(mainWindow->MESSAGETIE) ;
+    } else if(status==MainWindow::STATUSWHITEWIN){
+        mainWindow->sendMessage(mainWindow->MESSAGEWHITEWIN) ;
+    } else if(status==MainWindow::STATUSBLACKWIN){
+        mainWindow->sendMessage(mainWindow->MESSAGEBLACKWIN) ;
+    }
+}
+```
+
+即游戏结束时需要告知远程玩家。
